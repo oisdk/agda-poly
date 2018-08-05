@@ -13,9 +13,6 @@ module Monomial (commutativeSemiring : CommutativeSemiring Level.zero Level.zero
   Poly : Set
   Poly = Carrier × Terms
 
-  infixr 5 _∔_
-  pattern _∔_ x y = x , y
-
   data Terms where
     ⟨⟩  : Terms
     ⟨_⟩ : Poly → Terms
@@ -32,7 +29,7 @@ module Monomial (commutativeSemiring : CommutativeSemiring Level.zero Level.zero
   _⊕_ : Terms → Terms → Terms
   _⊕]_ : Terms → Poly → Poly
 
-  (x ∔ xs) ⊞ (y ∔ ys) = x + y ∔ (xs ⊕ ys)
+  (x , xs) ⊞ (y , ys) = x + y , (xs ⊕ ys)
 
   xs ⊕ ⟨⟩ = xs
   xs ⊕ ⟨ ys ⟩ = ⟨ xs ⊕] ys ⟩
@@ -43,32 +40,32 @@ module Monomial (commutativeSemiring : CommutativeSemiring Level.zero Level.zero
   infixl 7 _⨵_
   _⨵_ : Carrier → Terms → Terms
   x ⨵ ⟨⟩ = ⟨⟩
-  x ⨵ ⟨ y ∔ ys ⟩ = ⟨ x * y ∔ x ⨵ ys ⟩
+  x ⨵ ⟨ y , ys ⟩ = ⟨ x * y , x ⨵ ys ⟩
 
   infixl 7 _⊠_
   _⊠_ : Poly → Poly → Poly
   _⊗]_ : Terms → Poly → Terms
 
-  (x ∔ xs) ⊠ ys = x * c ys ∔ (x ⨵ Δ ys ⊕ xs ⊗] ys)
+  (x , xs) ⊠ ys = x * c ys , (x ⨵ Δ ys ⊕ xs ⊗] ys)
 
   ⟨⟩ ⊗] _ = ⟨⟩
   ⟨ xs ⟩ ⊗] ys = ⟨ xs ⊠ ys ⟩
 
   ⟦_⟧ : Poly → Carrier → Carrier
-  ⟦ x ∔ ⟨⟩ ⟧ ρ = x
-  ⟦ x ∔ ⟨ xs ⟩ ⟧ ρ = x + ⟦ xs ⟧ ρ * ρ
+  ⟦ x , ⟨⟩ ⟧ ρ = x
+  ⟦ x , ⟨ xs ⟩ ⟧ ρ = x + ⟦ xs ⟧ ρ * ρ
 
   open import SemiringReasoning commutativeSemiring
 
   +-hom : (xs ys : Poly) → (ρ : Carrier) → ⟦ xs ⟧ ρ + ⟦ ys ⟧ ρ ≈ ⟦ xs ⊞ ys ⟧ ρ
-  +-hom (x ∔ ⟨⟩) (y ∔ ⟨⟩) ρ = refl
-  +-hom (x ∔ ⟨⟩) (y ∔ ⟨ ys ⟩) ρ =
+  +-hom (x , ⟨⟩) (y , ⟨⟩) ρ = refl
+  +-hom (x , ⟨⟩) (y , ⟨ ys ⟩) ρ =
     begin
       x + (y + ⟦ ys ⟧ ρ * ρ)
     ≈⟨ sym (+-assoc x y _) ⟩
       x + y + ⟦ ys ⟧ ρ * ρ
     ∎
-  +-hom (x ∔ ⟨ xs ⟩) (y ∔ ⟨⟩) ρ =
+  +-hom (x , ⟨ xs ⟩) (y , ⟨⟩) ρ =
     begin
       x + ⟦ xs ⟧ ρ * ρ + y
     ≈⟨ +-assoc x _ y ⟩
@@ -78,7 +75,7 @@ module Monomial (commutativeSemiring : CommutativeSemiring Level.zero Level.zero
     ≈⟨ sym (+-assoc x y _) ⟩
       x + y + ⟦ xs ⟧ ρ * ρ
     ∎
-  +-hom (x ∔ ⟨ xs ⟩) (y ∔ ⟨ ys ⟩) ρ = begin
+  +-hom (x , ⟨ xs ⟩) (y , ⟨ ys ⟩) ρ = begin
       (x + ⟦ xs ⟧ ρ * ρ) + (y + ⟦ ys ⟧ ρ * ρ)
     ≈⟨ sym (+-assoc _ y _) ⟩
       ((x + ⟦ xs ⟧ ρ * ρ) + y) + (⟦ ys ⟧ ρ * ρ)
@@ -94,9 +91,9 @@ module Monomial (commutativeSemiring : CommutativeSemiring Level.zero Level.zero
       ⟦ xs ⊞ ys ⟧ ρ * ρ
     ∎
 
-  ⨵-hom : (x : Carrier) → (ys : Poly) → (ρ : Carrier) → x * ⟦ ys ⟧ ρ ≈ ⟦ x * c ys ∔ x ⨵ Δ ys ⟧ ρ
-  ⨵-hom x (y ∔ ⟨⟩) ρ = refl
-  ⨵-hom x (y ∔ ⟨ ys ⟩) ρ =
+  ⨵-hom : (x : Carrier) → (ys : Poly) → (ρ : Carrier) → x * ⟦ ys ⟧ ρ ≈ ⟦ x * c ys , x ⨵ Δ ys ⟧ ρ
+  ⨵-hom x (y , ⟨⟩) ρ = refl
+  ⨵-hom x (y , ⟨ ys ⟩) ρ =
     begin
       x * (y + ⟦ ys ⟧ ρ * ρ)
     ≈⟨ distribˡ x y _ ⟩
@@ -106,12 +103,12 @@ module Monomial (commutativeSemiring : CommutativeSemiring Level.zero Level.zero
     ≈⟨ sym (*-assoc x _ ρ) ⟩
       x * ⟦ ys ⟧ ρ * ρ
     ≈⟨ ⟨ ⨵-hom x ys ρ ⟩*⋯  ⟩
-      ⟦ x * c ys ∔ x ⨵ Δ ys ⟧ ρ * ρ
+      ⟦ x * c ys , x ⨵ Δ ys ⟧ ρ * ρ
     ∎
 
   *-hom : (x y : Poly) → (ρ : Carrier) → ⟦ x ⟧ ρ * ⟦ y ⟧ ρ ≈ ⟦ x ⊠ y ⟧ ρ
-  *-hom (x ∔ ⟨⟩) (y ∔ ⟨⟩) ρ = refl
-  *-hom (x ∔ ⟨⟩) (y ∔ ⟨ ys ⟩) ρ =
+  *-hom (x , ⟨⟩) (y , ⟨⟩) ρ = refl
+  *-hom (x , ⟨⟩) (y , ⟨ ys ⟩) ρ =
     begin
       x * (y + ⟦ ys ⟧ ρ * ρ)
     ≈⟨ distribˡ x y _ ⟩
@@ -121,9 +118,9 @@ module Monomial (commutativeSemiring : CommutativeSemiring Level.zero Level.zero
     ≈⟨ sym (*-assoc x _ ρ) ⟩
       (x * ⟦ ys ⟧ ρ) * ρ
     ≈⟨ ⟨ ⨵-hom x ys ρ ⟩*⋯ ⟩
-      ⟦ x * c ys ∔ x ⨵ Δ ys ⟧ ρ * ρ
+      ⟦ x * c ys , x ⨵ Δ ys ⟧ ρ * ρ
     ∎
-  *-hom (x ∔ ⟨ xs ⟩) (y ∔ ⟨⟩) ρ =
+  *-hom (x , ⟨ xs ⟩) (y , ⟨⟩) ρ =
     begin
       (x + ⟦ xs ⟧ ρ * ρ) * y
     ≈⟨ distribʳ y x _ ⟩
@@ -131,7 +128,7 @@ module Monomial (commutativeSemiring : CommutativeSemiring Level.zero Level.zero
     ≅⟨ ⋯+⟨_⟩ ⟩
       (⟦ xs ⟧ ρ * ρ) * y
     ≅⟨ sym ⟩
-      ⟦ xs ⊠ (y ∔ ⟨⟩) ⟧ ρ * ρ
+      ⟦ xs ⊠ (y , ⟨⟩) ⟧ ρ * ρ
     ≈⟨ ⟨ sym (*-hom xs _ ρ) ⟩*⋯ ⟩
       ⟦ xs ⟧ ρ * y * ρ
     ≈⟨ *-assoc _ y ρ ⟩
@@ -141,7 +138,7 @@ module Monomial (commutativeSemiring : CommutativeSemiring Level.zero Level.zero
     ≈⟨ sym (*-assoc _ ρ y) ⟩
       ⟦ xs ⟧ ρ * ρ * y
     ∎
-  *-hom (x ∔ ⟨ xs ⟩) (y ∔ ⟨ ys ⟩) ρ =
+  *-hom (x , ⟨ xs ⟩) (y , ⟨ ys ⟩) ρ =
     begin
       (x + ⟦ xs ⟧ ρ * ρ) * (y + ⟦ ys ⟧ ρ * ρ)
     ≈⟨ distribˡ _ y _ ⟩
@@ -161,11 +158,11 @@ module Monomial (commutativeSemiring : CommutativeSemiring Level.zero Level.zero
     ≅⟨ ⟨_⟩*⋯ ⟩
       ⟦ xs ⟧ ρ * y + (x + ⟦ xs ⟧ ρ * ρ) * ⟦ ys ⟧ ρ
     ≅⟨ sym ⟩
-      ⟦ (x * c ys ∔ x ⨵ Δ ys) ⊞ xs ⊠ (y ∔ ⟨ ys ⟩) ⟧ ρ
-    ≈⟨ sym (+-hom (x * c ys ∔ x ⨵ Δ ys) (xs ⊠ (y ∔ ⟨ ys ⟩)) ρ) ⟩
-      ⟦ (x * c ys ∔ x ⨵ Δ ys) ⟧ ρ + ⟦ xs ⊠ (y ∔ ⟨ ys ⟩) ⟧ ρ
+      ⟦ (x * c ys , x ⨵ Δ ys) ⊞ xs ⊠ (y , ⟨ ys ⟩) ⟧ ρ
+    ≈⟨ sym (+-hom (x * c ys , x ⨵ Δ ys) (xs ⊠ (y , ⟨ ys ⟩)) ρ) ⟩
+      ⟦ (x * c ys , x ⨵ Δ ys) ⟧ ρ + ⟦ xs ⊠ (y , ⟨ ys ⟩) ⟧ ρ
     ≈⟨ sym ⋯+⟨ *-hom xs _ ρ ⟩ ⟩
-      ⟦ (x * c ys ∔ x ⨵ Δ ys) ⟧ ρ + ⟦ xs ⟧ ρ * (y + ⟦ ys ⟧ ρ * ρ)
+      ⟦ (x * c ys , x ⨵ Δ ys) ⟧ ρ + ⟦ xs ⟧ ρ * (y + ⟦ ys ⟧ ρ * ρ)
     ≈⟨ sym ⟨ ⨵-hom x ys ρ ⟩+⋯ ⟩
       x * ⟦ ys ⟧ ρ + ⟦ xs ⟧ ρ * (y + ⟦ ys ⟧ ρ * ρ)
     ≈⟨ ⋯+⟨ distribˡ (⟦ xs ⟧ ρ) y _ ⟩ ⟩
