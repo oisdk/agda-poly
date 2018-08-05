@@ -9,12 +9,11 @@ open import Relation.Binary
 ----------------------------------------------------------------------
 module Monomial.Homomorphism
   (commutativeSemiring : CommutativeSemiring Level.zero Level.zero)
-  (_≟C_ : Decidable (CommutativeSemiring._≈_ commutativeSemiring))
   where
 
 open CommutativeSemiring commutativeSemiring
 
-open import Monomial commutativeSemiring _≟C_
+open import Monomial commutativeSemiring
 
 open import SemiringReasoning commutativeSemiring
 -- The ring of polynomials forms a homomorphism. Here, we prove that.

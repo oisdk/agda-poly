@@ -13,7 +13,6 @@ least-significant-figure-first, to make for efficient arithmetic.
 
 module Monomial
   (commutativeSemiring : CommutativeSemiring Level.zero Level.zero)
-  (_≟C_ : Decidable (CommutativeSemiring._≈_ commutativeSemiring))
   where
 
 open CommutativeSemiring commutativeSemiring

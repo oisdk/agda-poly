@@ -13,7 +13,7 @@ module Monomial.Equality
   where
 
 open CommutativeSemiring commutativeSemiring
-open import Monomial commutativeSemiring _≟C_
+open import Monomial commutativeSemiring
 open import SemiringReasoning commutativeSemiring
 open import Relation.Nullary
 
