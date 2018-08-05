@@ -47,34 +47,37 @@ pattern ⟨_⟩ x = just x
 -- Arithmetic
 ----------------------------------------------------------------------
 
--- Square points towards poly; circle towards terms. The multiple
--- definitions provide maximum information to the caller: for
--- instance, if the right argument to ⊕ isn't ⟨⟩, the result is
--- immediately wrapped in ⟨_⟩, without examining the left argument.
-infixl 6 _⊞_ _⊕_ _⊕]_
-_⊞_ : Poly → Poly → Poly
-_⊕_ : Terms → Terms → Terms
-_⊕]_ : Terms → Poly → Poly
-(x , xs) ⊞ (y , ys) = x + y , (xs ⊕ ys)
-xs ⊕ ⟨⟩ = xs
-xs ⊕ ⟨ ys ⟩ = ⟨ xs ⊕] ys ⟩
-⟨⟩ ⊕] ys = ys
-⟨ xs ⟩ ⊕] ys = xs ⊞ ys
+module Arithmetic where
+  -- Square points towards poly; circle towards terms. The multiple
+  -- definitions provide maximum information to the caller: for
+  -- instance, if the right argument to ⊕ isn't ⟨⟩, the result is
+  -- immediately wrapped in ⟨_⟩, without examining the left argument.
+  infixl 6 _⊞_ _⊕_ _⊕]_
+  _⊞_ : Poly → Poly → Poly
+  _⊕_ : Terms → Terms → Terms
+  _⊕]_ : Terms → Poly → Poly
+  (x , xs) ⊞ (y , ys) = x + y , (xs ⊕ ys)
+  xs ⊕ ⟨⟩ = xs
+  xs ⊕ ⟨ ys ⟩ = ⟨ xs ⊕] ys ⟩
+  ⟨⟩ ⊕] ys = ys
+  ⟨ xs ⟩ ⊕] ys = xs ⊞ ys
 
--- Multiply a polynomial by a constant factor
-infixl 7 _⨵_
-_⨵_ : Carrier → Terms → Terms
-x ⨵ ⟨⟩ = ⟨⟩
-x ⨵ ⟨ y , ys ⟩ = ⟨ x * y , x ⨵ ys ⟩
+  -- Multiply a polynomial by a constant factor
+  infixl 7 _⨵_
+  _⨵_ : Carrier → Terms → Terms
+  x ⨵ ⟨⟩ = ⟨⟩
+  x ⨵ ⟨ y , ys ⟩ = ⟨ x * y , x ⨵ ys ⟩
 
--- Multiply two polynomials. This function is careful to not add
--- any trailing zeroes.
-infixl 7 _⊠_
-_⊠_ : Poly → Poly → Poly
-_⊗]_ : Terms → Poly → Terms
-(x , xs) ⊠ ys = x * c ys , (x ⨵ Δ ys ⊕ xs ⊗] ys)
-⟨⟩ ⊗] _ = ⟨⟩
-⟨ xs ⟩ ⊗] ys = ⟨ xs ⊠ ys ⟩
+  -- Multiply two polynomials. This function is careful to not add
+  -- any trailing zeroes.
+  infixl 7 _⊠_
+  _⊠_ : Poly → Poly → Poly
+  _⊗]_ : Terms → Poly → Terms
+  (x , xs) ⊠ ys = x * c ys , (x ⨵ Δ ys ⊕ xs ⊗] ys)
+  ⟨⟩ ⊗] _ = ⟨⟩
+  ⟨ xs ⟩ ⊗] ys = ⟨ xs ⊠ ys ⟩
+
+open Arithmetic using (_⊞_; _⊠_; _⨵_) public
 
 ----------------------------------------------------------------------
 -- Evaluation

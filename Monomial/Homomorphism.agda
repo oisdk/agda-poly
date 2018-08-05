@@ -1,3 +1,5 @@
+{-# OPTIONS --without-K #-}
+
 open import Algebra using (CommutativeSemiring)
 import Level
 open import Data.Product
@@ -12,10 +14,9 @@ module Monomial.Homomorphism
   where
 
 open CommutativeSemiring commutativeSemiring
-
 open import Monomial commutativeSemiring
-
 open import SemiringReasoning commutativeSemiring
+
 -- The ring of polynomials forms a homomorphism. Here, we prove that.
 -- First, addition:
 +-hom : ∀ xs ys ρ → ⟦ xs ⟧ ρ + ⟦ ys ⟧ ρ ≈ ⟦ xs ⊞ ys ⟧ ρ

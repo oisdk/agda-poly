@@ -1,3 +1,5 @@
+{-# OPTIONS --without-K #-}
+
 open import Algebra using (CommutativeSemiring)
 import Level
 open import Data.Product
