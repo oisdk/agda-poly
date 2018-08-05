@@ -72,7 +72,6 @@ module Horner (commutativeSemiring : CommutativeSemiring Level.zero Level.zero) 
 
   open import SemiringReasoning commutativeSemiring
 
-
   pow-hom : (xs : Poly) → (ρ : Carrier) → ⟦ pow xs ⟧ ρ ≈ ⟦ xs ⟧ ρ * ρ
   pow-hom (i , x , xs) ρ =
     begin
