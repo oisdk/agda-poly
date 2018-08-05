@@ -14,10 +14,19 @@ open import Monomial commutativeSemiring
 open import Monomial.Equality commutativeSemiring
 open Propositional
 
-open CommutativeSemiring commutativeSemiring using (refl)
+open CommutativeSemiring commutativeSemiring
 
 open import Algebra.Structures _≈P_
 open Poly
 
--- poly-IsCommutativeSemiring : IsCommutativeSemiring _⊞_ _⊠_ (0# , ⟨⟩) (1# , ⟨⟩)
--- poly-IsCommutativeSemiring = {!!}
+poly-CommutativeSemiring : CommutativeSemiring Level.zero Level.zero
+poly-CommutativeSemiring = record
+  { Carrier = Poly
+  ; _≈_ = _≈P_
+  ; _+_ = _⊞_
+  ; _*_ = _⊠_
+  ; 0# = 0# , ⟨⟩
+  ; 1# = 1# , ⟨⟩
+  ; isCommutativeSemiring = trustMe
+  }
+  where postulate trustMe : _

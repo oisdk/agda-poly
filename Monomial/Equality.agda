@@ -7,7 +7,7 @@ open import Function
 open import Relation.Binary
 
 ----------------------------------------------------------------------
--- Homomorphism
+-- Equality
 ----------------------------------------------------------------------
 module Monomial.Equality
   (commutativeSemiring : CommutativeSemiring Level.zero Level.zero)
@@ -83,6 +83,10 @@ module Truncating where
     ⟨⟩ ≟T ⟨⟩ = yes ⟨ ⟨⟩≈0 ⟩≈0≈⟨ ⟨⟩≈0 ⟩
 
 module Propositional where
+  ----------------------------------------------------------------------
+  -- Non-normalising equality relations. (Are these called
+  -- "propositional?")
+  ----------------------------------------------------------------------
   infix 4 _≈P_ _≈T_
   _≈P_ : Poly → Poly → Set
   data _≈T_ : Terms → Terms → Set where

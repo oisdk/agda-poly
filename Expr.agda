@@ -14,13 +14,13 @@ open CommutativeSemiring commutativeSemiring
 
 infixl 7 _⊗_
 infixl 6 _⊕_
-data Expr : Set where
-  ι : Expr
-  κ : Carrier → Expr
-  _⊕_ : Expr → Expr → Expr
-  _⊗_ : Expr → Expr → Expr
+data Expr (A : Set) : Set where
+  ι : Expr A
+  κ : A → Expr A
+  _⊕_ : Expr A → Expr A → Expr A
+  _⊗_ : Expr A → Expr A → Expr A
 
-⟦_⟧ : Expr → Carrier → Carrier
+⟦_⟧ : Expr Carrier → Carrier → Carrier
 ⟦ ι ⟧ ρ = ρ
 ⟦ κ x ⟧ ρ = x
 ⟦ expₗ ⊕ expᵣ ⟧ ρ = ⟦ expₗ ⟧ ρ + ⟦ expᵣ ⟧ ρ
@@ -29,7 +29,7 @@ data Expr : Set where
 open import Monomial commutativeSemiring
   renaming (⟦_⟧ to ⟦_⟧ₚ)
 
-⟦_⟧↓ : Expr → Poly
+⟦_⟧↓ : Expr Carrier → Poly
 ⟦ ι ⟧↓ = ( 0# , ⟨ 1# , ⟨⟩  ⟩ )
 ⟦ κ x ⟧↓ = x , ⟨⟩
 ⟦ expₗ ⊕ expᵣ ⟧↓ = ⟦ expₗ ⟧↓ ⊞ ⟦ expᵣ ⟧↓
@@ -64,3 +64,8 @@ norm-hom (xs ⊗ ys) ρ =
   ≈⟨ *-cong (norm-hom xs ρ) (norm-hom ys ρ) ⟩
     ⟦ xs ⟧ ρ * ⟦ ys ⟧ ρ
   ∎
+
+open import Data.Nat as ℕ using (ℕ; suc; zero)
+Nesting : ℕ → Set
+Nesting ℕ.zero = Expr Carrier
+Nesting (suc n) = Expr (Nesting n)
