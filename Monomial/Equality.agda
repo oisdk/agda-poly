@@ -11,7 +11,6 @@ open import Relation.Binary
 ----------------------------------------------------------------------
 module Monomial.Equality
   (commutativeSemiring : CommutativeSemiring Level.zero Level.zero)
-  (_≟C_ : Decidable (CommutativeSemiring._≈_ commutativeSemiring))
   where
 
 open CommutativeSemiring commutativeSemiring
@@ -84,6 +83,7 @@ module Truncating where
     ⟨⟩ ≟T ⟨⟩ = yes ⟨ ⟨⟩≈0 ⟩≈0≈⟨ ⟨⟩≈0 ⟩
 
 module Propositional where
+  infix 4 _≈P_ _≈T_
   _≈P_ : Poly → Poly → Set
   data _≈T_ : Terms → Terms → Set where
     ⟨⟩-≈  : ⟨⟩ ≈T ⟨⟩
