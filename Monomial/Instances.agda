@@ -12,21 +12,28 @@ module Monomial.Instances
 
 open import Monomial commutativeSemiring
 open import Monomial.Equality commutativeSemiring
-open Propositional
 
 open CommutativeSemiring commutativeSemiring
 
-open import Algebra.Structures _≈P_
-open Poly
+-- open import Algebra.Structures _≈P_
+-- open Poly
 
-poly-CommutativeSemiring : CommutativeSemiring Level.zero Level.zero
-poly-CommutativeSemiring = record
-  { Carrier = Poly
-  ; _≈_ = _≈P_
-  ; _+_ = _⊞_
-  ; _*_ = _⊠_
-  ; 0# = 0# , ⟨⟩
-  ; 1# = 1# , ⟨⟩
-  ; isCommutativeSemiring = trustMe
-  }
-  where postulate trustMe : _
+-- ⊞-comm : ∀ xs ys → xs ⊞ ys ≈P ys ⊞ xs
+-- ⊞-comm (x , ⟨⟩)     (y , ⟨⟩)     = +-comm x y , ⟨⟩-≈
+-- ⊞-comm (x , ⟨⟩)     (y , ⟨ ys ⟩) = +-comm x y , {!!}
+-- ⊞-comm (x , ⟨ xs ⟩) (y , ⟨⟩)     = +-comm x y , {!!}
+-- ⊞-comm (x , ⟨ xs ⟩) (y , ⟨ ys ⟩) = +-comm x y , ⟨ ⊞-comm xs ys ⟩-≈
+
+-- poly-CommutativeSemiring : CommutativeSemiring Level.zero Level.zero
+-- poly-CommutativeSemiring = record
+--   { Carrier = Poly
+--   ; _≈_ = _≈P_
+--   ; _+_ = _⊞_
+--   ; _*_ = _⊠_
+--   ; 0# = 0# , ⟨⟩
+--   ; 1# = 1# , ⟨⟩
+--   ; isCommutativeSemiring = record
+--     { +-isCommutativeMonoid = {!!}
+--     ; *-isCommutativeMonoid = {!!} }
+--   }
+--   where postulate trustMe : _

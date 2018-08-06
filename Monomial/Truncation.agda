@@ -19,23 +19,35 @@ open import Monomial commutativeSemiring
 open import SemiringReasoning commutativeSemiring
 open import Relation.Nullary
 
-trunc-cons : Carrier → Terms → Terms
-trunc-cons x ⟨ xs ⟩ = ⟨ x , ⟨ xs ⟩ ⟩
-trunc-cons x ⟨⟩ with x ≟C 0#
-trunc-cons x ⟨⟩ | yes p = ⟨⟩
-trunc-cons x ⟨⟩ | no ¬p = ⟨ x , ⟨⟩ ⟩
+trunc-cons : Carrier → Poly → Poly
+trunc-cons x (y ∷ ys) = x ∷ y ∷ ys
+trunc-cons x [] with x ≟C 0#
+trunc-cons x [] | yes p = []
+trunc-cons x [] | no ¬p = x ∷ []
 
-trunc-cons-hom : ∀ z x xs ρ → ⟦ z , ⟨ x , xs ⟩ ⟧ ρ ≈ ⟦ z , trunc-cons x xs ⟧ ρ
-trunc-cons-hom z x ⟨ xs ⟩ ρ = refl
-trunc-cons-hom z x ⟨⟩ ρ with x ≟C 0#
-trunc-cons-hom z x ⟨⟩ ρ | no ¬p = refl
-trunc-cons-hom z x ⟨⟩ ρ | yes p =
+trunc-cons-hom : ∀ x xs ρ → ⟦ x ∷ xs ⟧ ρ ≈ ⟦ trunc-cons x xs ⟧ ρ
+trunc-cons-hom x (y ∷ ys) ρ = refl
+trunc-cons-hom x [] ρ with x ≟C 0#
+trunc-cons-hom x [] ρ | no ¬p = refl
+trunc-cons-hom x [] ρ | yes p =
   begin
-    z + x * ρ
-  ≈⟨ ⋯+⟨ ⟨ p ⟩*⋯ ⟩ ⟩
-    z + 0# * ρ
-  ≈⟨ ⋯+⟨ zeroˡ ρ ⟩ ⟩
-    z + 0#
-  ≈⟨ +-identityʳ z ⟩
-    z
+    x + 0# * ρ
+  ≈⟨ +-cong p (zeroˡ ρ) ⟩
+    0# + 0#
+  ≈⟨ +-identityˡ 0# ⟩
+    0#
+  ∎
+
+trunc : Poly → Poly
+trunc = foldr trunc-cons []
+
+trunc-hom : ∀ xs ρ → ⟦ xs ⟧ ρ ≈ ⟦ trunc xs ⟧ ρ
+trunc-hom [] ρ = refl
+trunc-hom (x ∷ xs) ρ =
+  begin
+    ⟦ x ∷ xs ⟧ ρ
+  ≈⟨ ⋯+⟨ ⟨ trunc-hom xs ρ ⟩*⋯ ⟩ ⟩
+    ⟦ x ∷ trunc xs ⟧ ρ
+  ≈⟨ trunc-cons-hom x (trunc xs) ρ ⟩
+    ⟦ trunc-cons x (trunc xs) ⟧ ρ
   ∎

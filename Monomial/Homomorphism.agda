@@ -20,43 +20,34 @@ open import SemiringReasoning commutativeSemiring
 -- The ring of polynomials forms a homomorphism. Here, we prove that.
 -- First, addition:
 +-hom : ∀ xs ys ρ → ⟦ xs ⟧ ρ + ⟦ ys ⟧ ρ ≈ ⟦ xs ⊞ ys ⟧ ρ
-+-hom (x , ⟨⟩) (y , ⟨⟩) ρ = refl
-+-hom (x , ⟨⟩) (y , ⟨ ys ⟩) ρ =
++-hom [] [] ρ = +-identityˡ 0#
++-hom [] (y ∷ ys) ρ = +-identityˡ (⟦ y ∷ ys ⟧ ρ)
++-hom (x ∷ xs) [] ρ = +-identityʳ (⟦ x ∷ xs ⟧ ρ)
++-hom (x ∷ xs) (y ∷ ys) ρ =
   begin
-    x + (y + ⟦ ys ⟧ ρ * ρ)
-  ≈⟨ sym (+-assoc x y _) ⟩
-    x + y + ⟦ ys ⟧ ρ * ρ
-  ∎
-+-hom (x , ⟨ xs ⟩) (y , ⟨⟩) ρ =
-  begin
-    x + ⟦ xs ⟧ ρ * ρ + y
-  ≈⟨ +-assoc x _ y ⟩
-    x + (⟦ xs ⟧ ρ * ρ + y)
-  ≈⟨ ⋯+⟨ +-comm _ y ⟩  ⟩
-    x + (y + ⟦ xs ⟧ ρ * ρ)
-  ≈⟨ sym (+-assoc x y _) ⟩
-    x + y + ⟦ xs ⟧ ρ * ρ
-  ∎
-+-hom (x , ⟨ xs ⟩) (y , ⟨ ys ⟩) ρ = begin
+    ⟦ x ∷ xs ⟧ ρ + ⟦ y ∷ ys ⟧ ρ
+  ≡⟨⟩
     (x + ⟦ xs ⟧ ρ * ρ) + (y + ⟦ ys ⟧ ρ * ρ)
-  ≈⟨ sym (+-assoc _ y _) ⟩
-    ((x + ⟦ xs ⟧ ρ * ρ) + y) + (⟦ ys ⟧ ρ * ρ)
+  ≈⟨ sym (+-assoc _ _ _) ⟩
+    ((x + ⟦ xs ⟧ ρ * ρ) + y) + ⟦ ys ⟧ ρ * ρ
   ≈⟨ ⟨ +-assoc x _ y ︔ ⋯+⟨ +-comm _ y ⟩ ︔ sym (+-assoc x y _) ⟩+⋯ ⟩
-    ((x + y) + ⟦ xs ⟧ ρ * ρ) + (⟦ ys ⟧ ρ * ρ)
+    ((x + y) + ⟦ xs ⟧ ρ * ρ) + ⟦ ys ⟧ ρ * ρ
   ≈⟨ +-assoc (x + y) _ _ ⟩
     (x + y) + (⟦ xs ⟧ ρ * ρ + ⟦ ys ⟧ ρ * ρ)
-  ≅⟨ ⋯+⟨_⟩ ⟩
-    ⟦ xs ⟧ ρ * ρ + ⟦ ys ⟧ ρ * ρ
-  ≈⟨ sym (distribʳ ρ _ _) ⟩
-    (⟦ xs ⟧ ρ + ⟦ ys ⟧ ρ) * ρ
-  ≈⟨ ⟨ +-hom xs ys ρ ⟩*⋯ ⟩
-    ⟦ xs ⊞ ys ⟧ ρ * ρ
+  ≈⟨ sym ⋯+⟨ distribʳ ρ _ _ ⟩ ⟩
+    (x + y) + (⟦ xs ⟧ ρ + ⟦ ys ⟧ ρ) * ρ
+  ≈⟨ ⋯+⟨ ⟨ +-hom xs ys ρ ⟩*⋯ ⟩ ⟩
+    (x + y) + ⟦ xs ⊞ ys ⟧ ρ * ρ
+  ≡⟨⟩
+    ⟦ x + y ∷ xs ⊞ ys ⟧ ρ
+  ≡⟨⟩
+    ⟦ (x ∷ xs) ⊞ (y ∷ ys) ⟧ ρ
   ∎
 
 -- For multiplication, we will first prove this smaller lemma.
-⨵-hom : ∀ x ys ρ → x * ⟦ ys ⟧ ρ ≈ ⟦ x * c ys , x ⨵ Δ ys ⟧ ρ
-⨵-hom x (y , ⟨⟩) ρ = refl
-⨵-hom x (y , ⟨ ys ⟩) ρ =
+⨵-hom : ∀ x ys ρ → x * ⟦ ys ⟧ ρ ≈ ⟦ x ⨵ ys ⟧ ρ
+⨵-hom x [] ρ = zeroʳ x
+⨵-hom x (y ∷ ys) ρ =
   begin
     x * (y + ⟦ ys ⟧ ρ * ρ)
   ≈⟨ distribˡ x y _ ⟩
@@ -66,43 +57,15 @@ open import SemiringReasoning commutativeSemiring
   ≈⟨ sym (*-assoc x _ ρ) ⟩
     x * ⟦ ys ⟧ ρ * ρ
   ≈⟨ ⟨ ⨵-hom x ys ρ ⟩*⋯  ⟩
-    ⟦ x * c ys , x ⨵ Δ ys ⟧ ρ * ρ
+    ⟦ x ⨵ ys ⟧ ρ * ρ
   ∎
 
 -- Then the full lemma itself.
 *-hom : ∀ xs ys ρ → ⟦ xs ⟧ ρ * ⟦ ys ⟧ ρ ≈ ⟦ xs ⊠ ys ⟧ ρ
-*-hom (x , ⟨⟩) (y , ⟨⟩) ρ = refl
-*-hom (x , ⟨⟩) (y , ⟨ ys ⟩) ρ =
-  begin
-    x * (y + ⟦ ys ⟧ ρ * ρ)
-  ≈⟨ distribˡ x y _ ⟩
-    x * y + x * (⟦ ys ⟧ ρ * ρ)
-  ≅⟨ ⋯+⟨_⟩ ⟩
-    x * (⟦ ys ⟧ ρ * ρ)
-  ≈⟨ sym (*-assoc x _ ρ) ⟩
-    (x * ⟦ ys ⟧ ρ) * ρ
-  ≈⟨ ⟨ ⨵-hom x ys ρ ⟩*⋯ ⟩
-    ⟦ x * c ys , x ⨵ Δ ys ⟧ ρ * ρ
-  ∎
-*-hom (x , ⟨ xs ⟩) (y , ⟨⟩) ρ =
-  begin
-    (x + ⟦ xs ⟧ ρ * ρ) * y
-  ≈⟨ distribʳ y x _ ⟩
-    x * y + (⟦ xs ⟧ ρ * ρ) * y
-  ≅⟨ ⋯+⟨_⟩ ⟩
-    (⟦ xs ⟧ ρ * ρ) * y
-  ≅⟨ sym ⟩
-    ⟦ xs ⊠ (y , ⟨⟩) ⟧ ρ * ρ
-  ≈⟨ ⟨ sym (*-hom xs _ ρ) ⟩*⋯ ⟩
-    ⟦ xs ⟧ ρ * y * ρ
-  ≈⟨ *-assoc _ y ρ ⟩
-    ⟦ xs ⟧ ρ * (y * ρ)
-  ≈⟨ ⋯*⟨ *-comm y ρ ⟩ ⟩
-    ⟦ xs ⟧ ρ * (ρ * y)
-  ≈⟨ sym (*-assoc _ ρ y) ⟩
-    ⟦ xs ⟧ ρ * ρ * y
-  ∎
-*-hom (x , ⟨ xs ⟩) (y , ⟨ ys ⟩) ρ =
+*-hom [] [] ρ = zeroˡ 0#
+*-hom [] (y ∷ ys) ρ = zeroˡ (⟦ y ∷ ys ⟧ ρ)
+*-hom (x ∷ xs) [] ρ = zeroʳ (⟦ x ∷ xs ⟧ ρ)
+*-hom (x ∷ xs) (y ∷ ys) ρ =
   begin
     (x + ⟦ xs ⟧ ρ * ρ) * (y + ⟦ ys ⟧ ρ * ρ)
   ≈⟨ distribˡ _ y _ ⟩
@@ -122,11 +85,11 @@ open import SemiringReasoning commutativeSemiring
   ≅⟨ ⟨_⟩*⋯ ⟩
     ⟦ xs ⟧ ρ * y + (x + ⟦ xs ⟧ ρ * ρ) * ⟦ ys ⟧ ρ
   ≅⟨ sym ⟩
-    ⟦ (x * c ys , x ⨵ Δ ys) ⊞ xs ⊠ (y , ⟨ ys ⟩) ⟧ ρ
-  ≈⟨ sym (+-hom (x * c ys , x ⨵ Δ ys) (xs ⊠ (y , ⟨ ys ⟩)) ρ) ⟩
-    ⟦ (x * c ys , x ⨵ Δ ys) ⟧ ρ + ⟦ xs ⊠ (y , ⟨ ys ⟩) ⟧ ρ
+    ⟦ (x ⨵ ys) ⊞ xs ⊠ (y ∷ ys) ⟧ ρ
+  ≈⟨ sym (+-hom (x ⨵ ys) (xs ⊠ (y ∷ ys)) ρ) ⟩
+    ⟦ (x ⨵ ys) ⟧ ρ + ⟦ xs ⊠ (y ∷ ys) ⟧ ρ
   ≈⟨ sym ⋯+⟨ *-hom xs _ ρ ⟩ ⟩
-    ⟦ (x * c ys , x ⨵ Δ ys) ⟧ ρ + ⟦ xs ⟧ ρ * (y + ⟦ ys ⟧ ρ * ρ)
+    ⟦ (x ⨵ ys) ⟧ ρ + ⟦ xs ⟧ ρ * (y + ⟦ ys ⟧ ρ * ρ)
   ≈⟨ sym ⟨ ⨵-hom x ys ρ ⟩+⋯ ⟩
     x * ⟦ ys ⟧ ρ + ⟦ xs ⟧ ρ * (y + ⟦ ys ⟧ ρ * ρ)
   ≈⟨ ⋯+⟨ distribˡ (⟦ xs ⟧ ρ) y _ ⟩ ⟩

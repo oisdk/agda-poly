@@ -30,8 +30,8 @@ open import Monomial commutativeSemiring
   renaming (⟦_⟧ to ⟦_⟧ₚ)
 
 ⟦_⟧↓ : Expr Carrier → Poly
-⟦ ι ⟧↓ = ( 0# , ⟨ 1# , ⟨⟩  ⟩ )
-⟦ κ x ⟧↓ = x , ⟨⟩
+⟦ ι ⟧↓ = 0# ∷ 1# ∷ []
+⟦ κ x ⟧↓ = x ∷ []
 ⟦ expₗ ⊕ expᵣ ⟧↓ = ⟦ expₗ ⟧↓ ⊞ ⟦ expᵣ ⟧↓
 ⟦ expₗ ⊗ expᵣ ⟧↓ = ⟦ expₗ ⟧↓ ⊠ ⟦ expᵣ ⟧↓
 
@@ -41,13 +41,24 @@ open import Monomial.Homomorphism commutativeSemiring
 norm-hom : ∀ xs ρ → ⟦ ⟦ xs ⟧↓ ⟧ₚ ρ ≈ ⟦ xs ⟧ ρ
 norm-hom ι ρ =
   begin
-    0# + 1# * ρ
-  ≈⟨ +-identityˡ (1# * ρ) ⟩
+    0# + (1# + 0# * ρ) * ρ
+  ≈⟨ +-identityˡ _ ⟩
+    (1# + 0# * ρ) * ρ
+  ≈⟨ ⟨ ⋯+⟨ zeroˡ ρ ⟩ ⟩*⋯ ⟩
+    (1# + 0#) * ρ
+  ≈⟨ ⟨ +-identityʳ 1# ⟩*⋯ ⟩
     1# * ρ
   ≈⟨ *-identityˡ ρ ⟩
     ρ
   ∎
-norm-hom (κ x) ρ = refl
+norm-hom (κ x) ρ =
+  begin
+    x + 0# * ρ
+  ≈⟨ ⋯+⟨ zeroˡ ρ ⟩ ⟩
+    x + 0#
+  ≈⟨ +-identityʳ x ⟩
+    x
+  ∎
 norm-hom (xs ⊕ ys) ρ =
   begin
     ⟦ ⟦ xs ⟧↓ ⊞ ⟦ ys ⟧↓ ⟧ₚ ρ
@@ -64,8 +75,3 @@ norm-hom (xs ⊗ ys) ρ =
   ≈⟨ *-cong (norm-hom xs ρ) (norm-hom ys ρ) ⟩
     ⟦ xs ⟧ ρ * ⟦ ys ⟧ ρ
   ∎
-
-open import Data.Nat as ℕ using (ℕ; suc; zero)
-Nesting : ℕ → Set
-Nesting ℕ.zero = Expr Carrier
-Nesting (suc n) = Expr (Nesting n)
