@@ -19,21 +19,25 @@ open import Data.Product
 Poly : Set
 Poly = List (ℕ × Carrier)
 
-module Arithmetic where
+infixl 6 _⊞_
+_⊞_ : Poly → Poly → Poly
+⊞-ne : ∀ {i j} → ℕ.Ordering i j → Carrier → Poly → Carrier → Poly → Poly
+⊞-ne-l : ℕ → Poly → Carrier → Poly → Poly
+⊞-ne-r : ℕ → Carrier → Poly → Poly → Poly
 
-  infixl 6 _⊞_
-  _⊞_ : Poly → Poly → Poly
+[] ⊞ ys = ys
+(x ∷ xs) ⊞ [] = x ∷ xs
+((i , x) ∷ xs) ⊞ ((j , y) ∷ ys) = ⊞-ne (ℕ.compare i j) x xs y ys
 
-  add-match : ∀ {i j} → ℕ.Ordering i j → Carrier → Poly → Carrier → Poly → Poly
-  [] ⊞ ys = ys
-  (x ∷ xs) ⊞ [] = x ∷ xs
-  ((i , x) ∷ xs) ⊞ ((j , y) ∷ ys) = add-match (ℕ.compare i j) x xs y ys
+⊞-ne (ℕ.less    i k) x xs y ys = (i , x) ∷ ⊞-ne-l k xs y ys
+⊞-ne (ℕ.equal   i  ) x xs y ys = (i , x + y) ∷ (xs ⊞ ys)
+⊞-ne (ℕ.greater j k) x xs y ys = (j , y) ∷ ⊞-ne-r k x xs ys
 
-  add-match (ℕ.less    i k) x [] y ys = (i , x) ∷ ((k , y) ∷ ys)
-  add-match (ℕ.less    i k) x ((i′ , x′) ∷ xs) y ys = (i , x) ∷ add-match (ℕ.compare i′ k) x′ xs y ys
-  add-match (ℕ.equal   i  ) x xs y ys = (i , x + y) ∷ (xs ⊞ ys)
-  add-match (ℕ.greater j k) x xs y [] = (j , y) ∷ (k , x) ∷ xs
-  add-match (ℕ.greater j k) x xs y ((j′ , y′) ∷ ys) = (j , y) ∷ add-match (ℕ.compare k j′) x xs y′ ys
+⊞-ne-l k [] y ys = (k , y) ∷ ys
+⊞-ne-l k ((i , x) ∷ xs) y ys = ⊞-ne (ℕ.compare i k) x xs y ys
+
+⊞-ne-r k x xs [] = (k , x) ∷ xs
+⊞-ne-r k x xs ((j , y) ∷ ys) = ⊞-ne (ℕ.compare k j) x xs y ys
 
 --   -- Multiply a polynomial by a constant factor
 --   infixl 7 _⨵_
@@ -48,8 +52,6 @@ module Arithmetic where
 --   ⟨⟩ ⊗] _ = ⟨⟩
 --   ⟨ xs ⟩ ⊗] ys = ⟨ xs ⊠ ys ⟩
 
-open Arithmetic using (_⊞_; add-match) public
-
 ----------------------------------------------------------------------
 -- Evaluation
 ----------------------------------------------------------------------
@@ -58,7 +60,7 @@ open Arithmetic using (_⊞_; add-match) public
 infixr 8 _^_
 _^_ : Carrier → ℕ → Carrier
 x ^ zer = 1#
-x ^ suc n = x ^ n * x
+x ^ suc n = x * x ^ n
 
 _↦_^*_ : Carrier → (ℕ × Carrier) → Carrier → Carrier
 ρ ↦ (i , x) ^* xs = (x + xs * ρ) * ρ ^ i
