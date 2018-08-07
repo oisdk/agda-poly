@@ -36,7 +36,10 @@ pow-add x (suc i) j =
   ∎
 
 +-hom : ∀ xs ys ρ → ⟦ xs ⊞ ys ⟧ ρ ≈ ⟦ xs ⟧ ρ + ⟦ ys ⟧ ρ
-⊞-ne-hom : ∀ {i j} → (c : ℕ.Ordering i j) → ∀ x xs y ys ρ → ⟦ ⊞-ne c x xs y ys ⟧ ρ ≈ ⟦ ((i , x) ∷ xs) ⟧ ρ + ⟦ ((j , y) ∷ ys) ⟧ ρ
+⊞-ne-hom : ∀ {i j}
+         → (c : ℕ.Ordering i j)
+         → ∀ x xs y ys ρ
+         → ⟦ ⊞-ne c x xs y ys ⟧ ρ ≈ ⟦ ((i , x) ∷ xs) ⟧ ρ + ⟦ ((j , y) ∷ ys) ⟧ ρ
 ⊞-ne-l-hom : ∀ k xs y ys ρ → ⟦ ⊞-ne-l k xs y ys ⟧ ρ ≈ ⟦ xs ⟧ ρ + ⟦ (k , y) ∷ ys ⟧ ρ
 ⊞-ne-r-hom : ∀ k x xs ys ρ → ⟦ ⊞-ne-r k x xs ys ⟧ ρ ≈ ⟦ (k , x) ∷ xs ⟧ ρ + ⟦ ys ⟧ ρ
 
@@ -46,7 +49,6 @@ pow-add x (suc i) j =
 ⊞-ne-r-hom k x xs [] ρ = sym (+-identityʳ _)
 ⊞-ne-r-hom k x xs ((j , y) ∷ ys) ρ = ⊞-ne-hom (ℕ.compare k j) x xs y ys ρ
 
-⊞-ne-hom (ℕ.greater j k) x xs y ys ρ = {!!}
 ⊞-ne-hom (ℕ.equal i) x xs y ys ρ =
   begin
     ((x + y) + ⟦ xs ⊞ ys ⟧ ρ * ρ) * ρ ^ i
@@ -95,6 +97,28 @@ pow-add x (suc i) j =
     ⟦ (i , x) ∷ xs ⟧ ρ + ⟦ (k ℕ.+ suc i , y) ∷ ys ⟧ ρ
   ≡⟨ ≡.cong (λ ik → ⟦ (i , x) ∷ xs ⟧ ρ + ⟦ (ik , y) ∷ ys ⟧ ρ) (ℕ-≡.+-comm k (suc i)) ⟩
     ⟦ (i , x) ∷ xs ⟧ ρ + ⟦ (suc (i ℕ.+ k) , y) ∷ ys ⟧ ρ
+  ∎
+⊞-ne-hom (ℕ.greater j k) x xs y ys ρ =
+  begin
+    ⟦ (j , y) ∷ ⊞-ne-r k x xs ys ⟧ ρ
+  ≡⟨⟩
+    (y + ⟦ ⊞-ne-r k x xs ys ⟧ ρ * ρ) * ρ ^ j
+  ≈⟨ ⟨ ⋯+⟨ ⟨ ⊞-ne-r-hom k x xs ys ρ ︔ +-comm _ _ ⟩*⋯ ⟩ ⟩*⋯ ⟩
+    (y + (⟦ ys ⟧ ρ + ⟦ (k , x) ∷ xs ⟧ ρ) * ρ) * ρ ^ j
+  ≈⟨ ⟨ ⋯+⟨ distribʳ ρ _ _ ⟩ ⟩*⋯ ⟩
+    (y + (⟦ ys ⟧ ρ * ρ + ⟦ (k , x) ∷ xs ⟧ ρ * ρ)) * ρ ^ j
+  ≈⟨ sym ⟨ +-assoc _ _ _ ⟩*⋯ ⟩
+    (y + ⟦ ys ⟧ ρ * ρ + ⟦ (k , x) ∷ xs ⟧ ρ * ρ) * ρ ^ j
+  ≈⟨ distribʳ (ρ ^ j) _ _ ⟩
+    ⟦ (j , y) ∷ ys ⟧ ρ + (⟦ (k , x) ∷ xs ⟧ ρ * ρ) * ρ ^ j
+  ≈⟨ ⋯+⟨ *-assoc _ ρ _ ⟩ ⟩
+    ⟦ (j , y) ∷ ys ⟧ ρ + ⟦ (k , x) ∷ xs ⟧ ρ * ρ ^ suc j
+  ≈⟨ ⋯+⟨ *-assoc _ _ _ ︔ ⋯*⟨ pow-add _ k (suc j) ⟩ ⟩ ⟩
+    ⟦ (j , y) ∷ ys ⟧ ρ + ⟦ (k ℕ.+ suc j , x) ∷ xs ⟧ ρ
+  ≈⟨ +-comm _ _ ⟩
+    ⟦ (k ℕ.+ suc j , x) ∷ xs ⟧ ρ + ⟦ (j , y) ∷ ys ⟧ ρ
+  ≡⟨ ≡.cong (λ kj → ⟦ (kj , x) ∷ xs ⟧ ρ + ⟦ (j , y) ∷ ys ⟧ ρ) (ℕ-≡.+-comm k (suc j)) ⟩
+    ⟦ (suc (j ℕ.+ k) , x) ∷ xs ⟧ ρ + ⟦ (j , y) ∷ ys ⟧ ρ
   ∎
 
 +-hom [] ys ρ = sym (+-identityˡ (⟦ ys ⟧ ρ))
