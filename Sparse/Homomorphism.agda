@@ -80,20 +80,14 @@ pow-add x (suc i) j =
   ≡⟨⟩
     (x + ⟦ ⊞-ne-l k xs y ys ⟧ ρ * ρ) * ρ ^ i
   ≈⟨ ⟨ ⋯+⟨ ⟨ ⊞-ne-l-hom k xs y ys ρ ⟩*⋯ ⟩ ⟩*⋯ ⟩
-    (x + (⟦ xs ⟧ ρ + (y + ⟦ ys ⟧ ρ * ρ) * ρ ^ k) * ρ) * ρ ^ i
-  ≈⟨ distribʳ (ρ ^ i) x _ ⟩
-    x * ρ ^ i + (⟦ xs ⟧ ρ + (y + ⟦ ys ⟧ ρ * ρ) * ρ ^ k) * ρ * ρ ^ i
-  ≈⟨ ⋯+⟨ *-assoc _ ρ _ ⟩ ⟩
-    x * ρ ^ i + (⟦ xs ⟧ ρ + (y + ⟦ ys ⟧ ρ * ρ) * ρ ^ k) * ρ ^ suc i
-  ≈⟨ ⋯+⟨ distribʳ (ρ ^ suc i) _ _ ⟩ ⟩
-    x * ρ ^ i + (⟦ xs ⟧ ρ * ρ ^ suc i + ((y + ⟦ ys ⟧ ρ * ρ) * ρ ^ k) * ρ ^ suc i)
-  ≈⟨ sym (+-assoc (x * ρ ^ i) _ _) ⟩
-    x * ρ ^ i + ⟦ xs ⟧ ρ * ρ ^ suc i + ((y + ⟦ ys ⟧ ρ * ρ) * ρ ^ k) * ρ ^ suc i
-  ≈⟨ ⟨ ⋯+⟨ sym (*-assoc _ ρ _ ) ⟩ ︔ sym (distribʳ (ρ ^ i) _ _ )⟩+⋯ ⟩
-    ⟦ (i , x) ∷ xs ⟧ ρ + ((y + ⟦ ys ⟧ ρ * ρ) * ρ ^ k) * ρ ^ suc i
-  ≈⟨ ⋯+⟨ *-assoc _ _ _ ⟩ ⟩
-    ⟦ (i , x) ∷ xs ⟧ ρ + (y + ⟦ ys ⟧ ρ * ρ) * ((ρ ^ k) * ρ ^ suc i)
-  ≈⟨ ⋯+⟨ ⋯*⟨ pow-add ρ k (suc i) ⟩ ⟩ ⟩
+    (x + (⟦ xs ⟧ ρ + ⟦ (k , y) ∷ ys ⟧ ρ) * ρ) * ρ ^ i
+  ≈⟨ ⟨ ⋯+⟨ distribʳ ρ _ _ ⟩ ⟩*⋯ ⟩
+    (x + (⟦ xs ⟧ ρ * ρ + ⟦ (k , y) ∷ ys ⟧ ρ * ρ)) * ρ ^ i
+  ≈⟨ sym ⟨ +-assoc x _ _ ⟩*⋯ ⟩
+    (x + ⟦ xs ⟧ ρ * ρ + ⟦ (k , y) ∷ ys ⟧ ρ * ρ) * ρ ^ i
+  ≈⟨ distribʳ (ρ ^ i) _ _ ⟩
+    ⟦ (i , x) ∷ xs ⟧ ρ + ⟦ (k , y) ∷ ys ⟧ ρ * ρ * ρ ^ i
+  ≈⟨ ⋯+⟨ *-assoc _ ρ (ρ ^ i) ︔ *-assoc _ (ρ ^ k) (ρ ^ suc i) ︔ ⋯*⟨ pow-add _ k (suc i) ⟩ ⟩  ⟩
     ⟦ (i , x) ∷ xs ⟧ ρ + ⟦ (k ℕ.+ suc i , y) ∷ ys ⟧ ρ
   ≡⟨ ≡.cong (λ ik → ⟦ (i , x) ∷ xs ⟧ ρ + ⟦ (ik , y) ∷ ys ⟧ ρ) (ℕ-≡.+-comm k (suc i)) ⟩
     ⟦ (i , x) ∷ xs ⟧ ρ + ⟦ (suc (i ℕ.+ k) , y) ∷ ys ⟧ ρ
