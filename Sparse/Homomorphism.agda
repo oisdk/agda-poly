@@ -40,8 +40,11 @@ pow-add x (suc i) j =
 ⊞-ne-l-hom : ∀ k xs y ys ρ → ⟦ ⊞-ne-l k xs y ys ⟧ ρ ≈ ⟦ xs ⟧ ρ + ⟦ (k , y) ∷ ys ⟧ ρ
 ⊞-ne-r-hom : ∀ k x xs ys ρ → ⟦ ⊞-ne-r k x xs ys ⟧ ρ ≈ ⟦ (k , x) ∷ xs ⟧ ρ + ⟦ ys ⟧ ρ
 
-⊞-ne-l-hom k xs y ys ρ = {!!}
-⊞-ne-r-hom k x xs ys ρ = {!!}
+⊞-ne-l-hom k [] y ys ρ = sym (+-identityˡ _)
+⊞-ne-l-hom k ((i , x) ∷ xs) y ys ρ = ⊞-ne-hom (ℕ.compare i k) x xs y ys ρ
+
+⊞-ne-r-hom k x xs [] ρ = sym (+-identityʳ _)
+⊞-ne-r-hom k x xs ((j , y) ∷ ys) ρ = ⊞-ne-hom (ℕ.compare k j) x xs y ys ρ
 
 ⊞-ne-hom (ℕ.greater j k) x xs y ys ρ = {!!}
 ⊞-ne-hom (ℕ.equal i) x xs y ys ρ =
@@ -69,48 +72,29 @@ pow-add x (suc i) j =
   ≈⟨ distribʳ (ρ ^ i) _ _ ⟩
     (x + ⟦ xs ⟧ ρ * ρ) * ρ ^ i + (y + ⟦ ys ⟧ ρ * ρ) * ρ ^ i
   ∎
-⊞-ne-hom (ℕ.less i k) x [] y ys ρ =
+⊞-ne-hom (ℕ.less i k) x xs y ys ρ =
   begin
-    ⟦ (i , x) ∷ ((k , y) ∷ ys) ⟧ ρ
+    ⟦ (i , x) ∷ ⊞-ne-l k xs y ys ⟧ ρ
   ≡⟨⟩
-    (x + ⟦ (k , y) ∷ ys ⟧ ρ * ρ) * ρ ^ i
-  ≡⟨⟩
-    (x + ((y + ⟦ ys ⟧ ρ * ρ) * ρ ^ k) * ρ) * ρ ^ i
-  ≈⟨ ⟨ ⋯+⟨ *-assoc _ _ ρ ⟩ ⟩*⋯ ⟩
-    (x + (y + ⟦ ys ⟧ ρ * ρ) * (ρ ^ k * ρ)) * ρ ^ i
+    (x + ⟦ ⊞-ne-l k xs y ys ⟧ ρ * ρ) * ρ ^ i
+  ≈⟨ ⟨ ⋯+⟨ ⟨ ⊞-ne-l-hom k xs y ys ρ ⟩*⋯ ⟩ ⟩*⋯ ⟩
+    (x + (⟦ xs ⟧ ρ + (y + ⟦ ys ⟧ ρ * ρ) * ρ ^ k) * ρ) * ρ ^ i
   ≈⟨ distribʳ (ρ ^ i) x _ ⟩
-    x * ρ ^ i + (y + ⟦ ys ⟧ ρ * ρ) * (ρ ^ k * ρ) * ρ ^ i
+    x * ρ ^ i + (⟦ xs ⟧ ρ + (y + ⟦ ys ⟧ ρ * ρ) * ρ ^ k) * ρ * ρ ^ i
+  ≈⟨ ⋯+⟨ *-assoc _ ρ _ ⟩ ⟩
+    x * ρ ^ i + (⟦ xs ⟧ ρ + (y + ⟦ ys ⟧ ρ * ρ) * ρ ^ k) * ρ ^ suc i
+  ≈⟨ ⋯+⟨ distribʳ (ρ ^ suc i) _ _ ⟩ ⟩
+    x * ρ ^ i + (⟦ xs ⟧ ρ * ρ ^ suc i + ((y + ⟦ ys ⟧ ρ * ρ) * ρ ^ k) * ρ ^ suc i)
+  ≈⟨ sym (+-assoc (x * ρ ^ i) _ _) ⟩
+    x * ρ ^ i + ⟦ xs ⟧ ρ * ρ ^ suc i + ((y + ⟦ ys ⟧ ρ * ρ) * ρ ^ k) * ρ ^ suc i
+  ≈⟨ ⟨ ⋯+⟨ sym (*-assoc _ ρ _ ) ⟩ ︔ sym (distribʳ (ρ ^ i) _ _ )⟩+⋯ ⟩
+    ⟦ (i , x) ∷ xs ⟧ ρ + ((y + ⟦ ys ⟧ ρ * ρ) * ρ ^ k) * ρ ^ suc i
   ≈⟨ ⋯+⟨ *-assoc _ _ _ ⟩ ⟩
-    x * ρ ^ i + (y + ⟦ ys ⟧ ρ * ρ) * ((ρ ^ k * ρ) * ρ ^ i)
-  ≈⟨ ⋯+⟨ ⋯*⟨ begin
-               (ρ ^ k * ρ) * ρ ^ i
-             ≈⟨ *-assoc _ ρ _ ⟩
-               ρ ^ k * (ρ * ρ ^ i)
-             ≡⟨⟩
-               ρ ^ k * ρ ^ suc i
-             ≈⟨ pow-add ρ k _ ⟩
-               ρ ^ (k ℕ.+ suc i)
-             ≡⟨ ≡.cong (ρ ^_) (ℕ-≡.+-comm k (suc i)) ⟩
-               ρ ^ suc (i ℕ.+ k)
-             ∎
-  ⟩ ⟩ ⟩
-    x * ρ ^ i + (y + ⟦ ys ⟧ ρ * ρ) * ρ ^ suc (i ℕ.+ k)
-  ≈⟨ sym ⟨ ⟨ ⋯+⟨ zeroˡ ρ ⟩ ︔ +-identityʳ x ⟩*⋯ ⟩+⋯ ⟩
-    (x + 0# * ρ) * ρ ^ i + (y + ⟦ ys ⟧ ρ * ρ) * ρ ^ suc (i ℕ.+ k)
-  ≡⟨⟩
-    ⟦ (i , x) ∷ [] ⟧ ρ + ⟦ (suc (i ℕ.+ k) , y) ∷ ys ⟧ ρ
-  ∎
-⊞-ne-hom (ℕ.less i k) x ((i′ , x′) ∷ xs) y ys ρ =
-  begin
-    ⟦ (i , x) ∷ ⊞-ne (ℕ.compare i′ k) x′ xs y ys ⟧ ρ
-  ≡⟨⟩
-    (x + ⟦ ⊞-ne (ℕ.compare i′ k) x′ xs y ys ⟧ ρ * ρ) * ρ ^ i
-  ≈⟨ {!!} ⟩
-  (x + ⟦ (i′ , x′) ∷ xs ⟧ ρ * ρ) * ρ ^ i + (y + ⟦ ys ⟧ ρ * ρ) * ρ ^ suc (i ℕ.+ k)
-    ≡⟨⟩
-    (x + ⟦ (i′ , x′) ∷ xs ⟧ ρ * ρ) * ρ ^ i + ⟦ (suc (i ℕ.+ k) , y) ∷ ys ⟧ ρ
-  ≡⟨⟩
-    ⟦ (i , x) ∷ (i′ , x′) ∷ xs ⟧ ρ + ⟦ (suc (i ℕ.+ k) , y) ∷ ys ⟧ ρ
+    ⟦ (i , x) ∷ xs ⟧ ρ + (y + ⟦ ys ⟧ ρ * ρ) * ((ρ ^ k) * ρ ^ suc i)
+  ≈⟨ ⋯+⟨ ⋯*⟨ pow-add ρ k (suc i) ⟩ ⟩ ⟩
+    ⟦ (i , x) ∷ xs ⟧ ρ + ⟦ (k ℕ.+ suc i , y) ∷ ys ⟧ ρ
+  ≡⟨ ≡.cong (λ ik → ⟦ (i , x) ∷ xs ⟧ ρ + ⟦ (ik , y) ∷ ys ⟧ ρ) (ℕ-≡.+-comm k (suc i)) ⟩
+    ⟦ (i , x) ∷ xs ⟧ ρ + ⟦ (suc (i ℕ.+ k) , y) ∷ ys ⟧ ρ
   ∎
 
 +-hom [] ys ρ = sym (+-identityˡ (⟦ ys ⟧ ρ))
