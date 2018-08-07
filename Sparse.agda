@@ -12,7 +12,7 @@ module Sparse
 open CommutativeSemiring commutativeSemiring
 
 open import Data.Maybe
-open import Data.Nat as ℕ using (suc; ℕ) renaming (zero to zer)
+open import Data.Nat as ℕ using (suc; zero; ℕ)
 open import Data.List as List using (List; _∷_; []; foldr) public
 open import Data.Product
 
@@ -50,6 +50,12 @@ _⊠_ : Poly → Poly → Poly
 (x ∷ xs) ⊠ [] = []
 ((i , x) ∷ xs) ⊠ ((j , y) ∷ ys) = (i ℕ.+ j , x * y) ∷ x ⋊ ys ⊞ xs ⊠ ((0 , y) ∷ ys)
 
+κ : Carrier → Poly
+κ x = (0 ,  x) ∷ []
+
+ι : Poly
+ι = (1 , 1#) ∷ []
+
 ----------------------------------------------------------------------
 -- Evaluation
 ----------------------------------------------------------------------
@@ -57,11 +63,11 @@ _⊠_ : Poly → Poly → Poly
 
 infixr 8 _^_
 _^_ : Carrier → ℕ → Carrier
-x ^ zer = 1#
+x ^ zero = 1#
 x ^ suc n = x * x ^ n
 
 _↦_^*_ : Carrier → (ℕ × Carrier) → Carrier → Carrier
 ρ ↦ (i , x) ^* xs = (x + xs * ρ) * ρ ^ i
 
 ⟦_⟧ : Poly → Carrier → Carrier
-⟦ xs′ ⟧ ρ = List.foldr (ρ ↦_^*_) 0# xs′
+⟦ xs ⟧ ρ = List.foldr (ρ ↦_^*_) 0# xs

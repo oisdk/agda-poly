@@ -183,3 +183,29 @@ pow-add x (suc i) j =
   ≡⟨⟩
     ⟦ ((i , x) ∷ xs) ⟧ ρ * ⟦ (j , y) ∷ ys ⟧ ρ
   ∎
+
+κ-hom : ∀ x ρ → ⟦ κ x ⟧ ρ ≈ x
+κ-hom x ρ =
+  begin
+    ⟦ κ x ⟧ ρ
+  ≡⟨⟩
+    (x + 0# * ρ) * ρ ^ 0
+  ≈⟨ *-identityʳ _ ⟩
+    x + 0# * ρ
+  ≈⟨ ⋯+⟨ zeroˡ ρ ⟩ ⟩
+    x + 0#
+  ≈⟨ +-identityʳ x ⟩
+    x
+  ∎
+
+ι-hom : ∀ ρ → ⟦ ι ⟧ ρ ≈ ρ
+ι-hom ρ =
+  begin
+    ⟦ ι ⟧ ρ
+  ≡⟨⟩
+    (1# + 0# * ρ) * ρ ^ 1
+  ≈⟨ (⋯+⟨ zeroˡ ρ ⟩ ︔ +-identityʳ 1#) ⟨ *-cong ⟩ *-identityʳ ρ ⟩
+    1# * ρ
+  ≈⟨ *-identityˡ ρ ⟩
+    ρ
+  ∎
