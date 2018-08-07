@@ -39,18 +39,16 @@ _⊞_ : Poly → Poly → Poly
 ⊞-ne-r k x xs [] = (k , x) ∷ xs
 ⊞-ne-r k x xs ((j , y) ∷ ys) = ⊞-ne (ℕ.compare k j) x xs y ys
 
---   -- Multiply a polynomial by a constant factor
---   infixl 7 _⨵_
---   _⨵_ : Carrier → Terms → Terms
---   x ⨵ ⟨⟩ = ⟨⟩
---   x ⨵ ⟨ i , y , ys ⟩ = ⟨ i , x * y , x ⨵ ys ⟩
+-- Multiply a polynomial by a constant factor
+infixl 7 _⋊_
+_⋊_ : Carrier → Poly → Poly
+x ⋊ ys = List.map (map₂ (x *_)) ys
 
---   infixl 7 _⊠_ _⊗]_
---   _⊠_ : Poly → Poly → Poly
---   _⊗]_ : Terms → Poly → Terms
---   (i , x , xs) ⊠ ys = i ℕ.+ o ys , x * c ys , (x ⨵ Δ ys ⊕ xs ⊗] ys)
---   ⟨⟩ ⊗] _ = ⟨⟩
---   ⟨ xs ⟩ ⊗] ys = ⟨ xs ⊠ ys ⟩
+infixl 7 _⊠_
+_⊠_ : Poly → Poly → Poly
+[] ⊠ _ = []
+(x ∷ xs) ⊠ [] = []
+((i , x) ∷ xs) ⊠ ((j , y) ∷ ys) = (i ℕ.+ j , x * y) ∷ x ⋊ ys ⊞ xs ⊠ ((0 , y) ∷ ys)
 
 ----------------------------------------------------------------------
 -- Evaluation
