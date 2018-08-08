@@ -1,23 +1,18 @@
-{-# OPTIONS --without-K #-}
-
 open import Algebra using (CommutativeSemiring)
-import Level
-open import Function
-open import Relation.Binary
 
-module Sparse
-  (commutativeSemiring : CommutativeSemiring Level.zero Level.zero)
+module Polynomials.Monomial.Sparse
+  {a ℓ}
+  (commutativeSemiring : CommutativeSemiring a ℓ)
   where
 
 open CommutativeSemiring commutativeSemiring
 
-open import Data.Maybe
-open import Data.Nat as ℕ using (suc; zero; ℕ)
-open import Data.List as List using (List; _∷_; []; foldr) public
+open import Data.List as List using (_∷_; []; foldr) public
+open import Data.Nat as ℕ using (ℕ; suc; zero)
 open import Data.Product
 
-Poly : Set
-Poly = List (ℕ × Carrier)
+Poly : Set a
+Poly = List.List (ℕ × Carrier)
 
 infixl 6 _⊞_
 _⊞_ : Poly → Poly → Poly

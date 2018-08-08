@@ -1,18 +1,18 @@
-{-# OPTIONS --without-K  --exact-split #-}
+{-# OPTIONS --without-K --exact-split #-}
+
+-- Polynomials in Horner normal form. The representation here is
+-- dense, which is quite inefficient. In particular, something like
+-- 1 + x⁴ would be represented as:
+--
+--     1 ∷ 0 ∷ 0 ∷ 0 ∷ 1 ∷ []
+--
+-- The zeroes in the middle could conceivably be collapsed.
 
 open import Algebra using (CommutativeSemiring)
-import Level
-open import Data.Product
-open import Function
-open import Relation.Binary
 
-{-
-Monomial representations of polynomials. They're stored
-least-significant-figure-first, to make for efficient arithmetic.
--}
-
-module Monomial
-  (commutativeSemiring : CommutativeSemiring Level.zero Level.zero)
+module Polynomials.Monomial.Dense
+  {a ℓ}
+  (commutativeSemiring : CommutativeSemiring a ℓ)
   where
 
 open CommutativeSemiring commutativeSemiring
@@ -20,7 +20,7 @@ open CommutativeSemiring commutativeSemiring
 ----------------------------------------------------------------------
 -- Definitions
 ----------------------------------------------------------------------
-open import Data.List as List using ([]; _∷_; foldr) public
+open import Data.List as List using ([]; _∷_; foldr)
 
 -- A polynomial is a coefficient with an optional addition of terms
 -- to a higher power. For instance, the term
@@ -29,9 +29,10 @@ open import Data.List as List using ([]; _∷_; foldr) public
 --
 -- could be represented as:
 --
---    1 , ⟨ 2 , ⟨ 5 , ⟨⟩ ⟩ ⟩
-Poly : Set
+--    1 ∷ 2 ∷ 5 ∷ []
+Poly : Set a
 Poly = List.List Carrier
+
 
 -- Square points towards poly; circle towards terms. The multiple
 -- definitions provide maximum information to the caller: for
@@ -45,14 +46,14 @@ _⊞_ : Poly → Poly → Poly
 
 -- Multiply two polynomials. This function is careful to not add
 -- any trailing zeroes.
-infixl 7 _⊠_ _⨵_
-_⨵_ : Carrier → Poly → Poly
-_⨵_ x = List.map (x *_)
+infixl 7 _⊠_ _⋊_
+_⋊_ : Carrier → Poly → Poly
+_⋊_ x = List.map (x *_)
 
 _⊠_ : Poly → Poly → Poly
 [] ⊠ _ = []
 (x ∷ xs) ⊠ [] = []
-(x ∷ xs) ⊠ (y ∷ ys) = x * y ∷ x ⨵ ys ⊞ xs ⊠ (y ∷ ys)
+(x ∷ xs) ⊠ (y ∷ ys) = x * y ∷ x ⋊ ys ⊞ xs ⊠ (y ∷ ys)
 
 ----------------------------------------------------------------------
 -- Evaluation
