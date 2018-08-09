@@ -17,6 +17,8 @@ polySemiring : ℕ → CommutativeSemiring a ℓ
 
 data Poly : ℕ → Set a where
   Κ : Carrier → Poly 0
-  Ι : ∀ n {m} → Mono (polySemiring m) → Poly (n ℕ.+ m)
+  Ι : ∀ n {m} → Mono (polySemiring m) → Poly (suc n ℕ.+ m)
 
-polySemiring = {!!}
+polySemiring n = record
+  { Carrier = Poly n
+  }
