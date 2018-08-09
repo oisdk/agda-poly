@@ -1,16 +1,22 @@
 {-# OPTIONS --without-K #-}
 
 open import Algebra using (CommutativeSemiring)
+open import Relation.Binary
+open import Algebra.FunctionProperties
 
 -- Some specialised tools for equaltional reasoning.
 module Polynomials.SemiringReasoning
   {a ℓ}
-  (commutativeSemiring : CommutativeSemiring a ℓ)
+  (setoid : Setoid a ℓ)
+  (_+_ : Setoid.Carrier setoid → Setoid.Carrier setoid → Setoid.Carrier setoid)
+  (_*_ : Setoid.Carrier setoid → Setoid.Carrier setoid → Setoid.Carrier setoid)
+  (+-cong : Congruent₂ (Setoid._≈_ setoid) _+_)
+  (*-cong : Congruent₂ (Setoid._≈_ setoid) _*_)
   where
 
 import Relation.Binary.PropositionalEquality as ≡
-open CommutativeSemiring commutativeSemiring
 open import Relation.Binary.EqReasoning setoid public
+open Setoid setoid
 
 -- Standard Equational reasoning combinators
 

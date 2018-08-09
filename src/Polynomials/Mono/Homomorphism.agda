@@ -13,7 +13,7 @@ module Polynomials.Mono.Homomorphism
   where
 
 open CommutativeSemiring commutativeSemiring
-open import Polynomials.SemiringReasoning commutativeSemiring
+open import Polynomials.SemiringReasoning setoid _+_ _*_ +-cong *-cong
 open import Polynomials.Mono commutativeSemiring _≟C_
 
 open import Relation.Nullary
