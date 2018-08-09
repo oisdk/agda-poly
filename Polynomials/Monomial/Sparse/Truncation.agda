@@ -83,9 +83,9 @@ module Homomorphism where
       (0# + ⟦ xs ⟧ ρ * ρ) * ρ ^ i
     ≈⟨ ≪* +-identityˡ _ ⟩
       (⟦ xs ⟧ ρ * ρ) * ρ ^ i
-    ≈⟨ ≪* ≪* (normalise-hom xs ρ) ⟩
-      ⟦ normalise xs ⟧ ρ * ρ * ρ ^ i
     ≈⟨ *-assoc _ ρ _ ⟩
+      ⟦ xs ⟧ ρ * ρ ^ suc i
+    ≈⟨ ≪* normalise-hom xs ρ ⟩
       ⟦ normalise xs ⟧ ρ * ρ ^ suc i
     ≈⟨ pow-hom (suc i) (normalise xs) ρ ⟩
       ⟦ pow (suc i) (normalise xs) ⟧ ρ
