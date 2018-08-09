@@ -1,13 +1,15 @@
 open import Algebra using (CommutativeSemiring)
+open import Relation.Binary
 
-module Polynomials.Monomial.Sparse.Equality
+module Polynomials.Mono.Equality
   {a ℓ}
   (commutativeSemiring : CommutativeSemiring a ℓ)
+  (_≟C_ : Decidable (CommutativeSemiring._≈_ commutativeSemiring))
   where
 
 open CommutativeSemiring commutativeSemiring
 
-open import Polynomials.Monomial.Sparse commutativeSemiring
+open import Polynomials.Mono commutativeSemiring _≟C_
 open import Data.List as List using ([]; _∷_)
 open import Data.Product
 open import Level using (_⊔_)
@@ -28,21 +30,17 @@ open import Function
 open import Relation.Nullary
 open import Relation.Binary
 
-module Decidable
-  (_≟C_ : Decidable (CommutativeSemiring._≈_ commutativeSemiring))
-  where
+import Data.Nat as ℕ
+import Relation.Binary.PropositionalEquality as ≡
 
-  import Data.Nat as ℕ
-  import Relation.Binary.PropositionalEquality as ≡
-
-  _≟_ : ∀ xs ys → Dec (xs ≋ ys)
-  [] ≟ [] = yes []≋
-  [] ≟ (x ∷ ys) = no λ ()
-  (x ∷ xs) ≟ [] = no λ ()
-  ((i , x) ∷ xs) ≟ ((j , y) ∷ ys) with i ℕ.≟ j
-  ... | no ¬p = no λ { (z ∷≋ zs) → ¬p ≡.refl }
-  ... | yes ≡.refl with x ≟C y
-  ... | no ¬p = no λ { (z ∷≋ zs) → ¬p z }
-  ... | yes p with xs ≟ ys
-  ... | no ¬p = no λ { (z ∷≋ zs) → ¬p zs }
-  ... | yes ps = yes (p ∷≋ ps)
+_≟_ : ∀ xs ys → Dec (xs ≋ ys)
+[] ≟ [] = yes []≋
+[] ≟ (x ∷ ys) = no λ ()
+(x ∷ xs) ≟ [] = no λ ()
+((i , x) ∷ xs) ≟ ((j , y) ∷ ys) with i ℕ.≟ j
+... | no ¬p = no λ { (z ∷≋ zs) → ¬p ≡.refl }
+... | yes ≡.refl with x ≟C y
+... | no ¬p = no λ { (z ∷≋ zs) → ¬p z }
+... | yes p with xs ≟ ys
+... | no ¬p = no λ { (z ∷≋ zs) → ¬p zs }
+... | yes ps = yes (p ∷≋ ps)

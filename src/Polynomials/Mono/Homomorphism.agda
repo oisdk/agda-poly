@@ -1,19 +1,22 @@
 {-# OPTIONS --without-K #-}
 
 open import Algebra using (CommutativeSemiring)
+open import Relation.Binary
 
 ----------------------------------------------------------------------
 -- Homomorphism
 ----------------------------------------------------------------------
-module Polynomials.Monomial.Sparse.Homomorphism
+module Polynomials.Mono.Homomorphism
   {a ℓ}
   (commutativeSemiring : CommutativeSemiring a ℓ)
+  (_≟C_ : Decidable (CommutativeSemiring._≈_ commutativeSemiring))
   where
 
 open CommutativeSemiring commutativeSemiring
 open import Polynomials.SemiringReasoning commutativeSemiring
-open import Polynomials.Monomial.Sparse commutativeSemiring
+open import Polynomials.Mono commutativeSemiring _≟C_
 
+open import Relation.Nullary
 open import Data.Nat as ℕ using (ℕ; suc; zero)
 open import Data.Product
 import Data.Nat.Properties as ℕ-≡
@@ -36,6 +39,40 @@ pow-add x (suc i) j =
     x ^ suc (i ℕ.+ j)
   ∎
 
+pow-hom : ∀ i xs ρ → ⟦ xs ⟧ ρ * ρ ^ i ≈ ⟦ pow i xs ⟧ ρ
+pow-hom i [] ρ = zeroˡ (ρ ^ i)
+pow-hom i ((j , x) ∷ xs) ρ = *-assoc _ (ρ ^ j) (ρ ^ i) ︔ *≫ pow-add ρ j i
+
+∷↓-hom : ∀ x xs ρ → ⟦ x ∷ xs ⟧ ρ ≈ ⟦ x ∷↓ xs ⟧ ρ
+∷↓-hom (i , x) xs ρ with x ≟C 0#
+∷↓-hom (i , x) xs ρ | no ¬p = refl
+∷↓-hom (i , x) [] ρ | yes p =
+  begin
+    (x + 0# * ρ) * ρ ^ i
+  ≈⟨ ≪* (p ⟨ +-cong ⟩ zeroˡ ρ) ⟩
+    (0# + 0#) * ρ ^ i
+  ≈⟨ (≪* +-identityʳ 0#) ⟩
+    0# * ρ ^ i
+  ≈⟨ zeroˡ (ρ ^ i) ⟩
+    0#
+  ∎
+∷↓-hom (i , x) ((j , y) ∷ xs) ρ | yes p =
+  begin
+    (x + (y + ⟦ xs ⟧ ρ * ρ) * ρ ^ j * ρ) * ρ ^ i
+  ≈⟨ distribʳ (ρ ^ i) x _ ⟩
+    x * ρ ^ i + (y + ⟦ xs ⟧ ρ * ρ) * ρ ^ j * ρ * ρ ^ i
+  ≈⟨ ≪+ (≪* p ︔ zeroˡ (ρ ^ i)) ⟩
+    0# + (y + ⟦ xs ⟧ ρ * ρ) * ρ ^ j * ρ * ρ ^ i
+  ≈⟨ +-identityˡ _ ⟩
+    (y + ⟦ xs ⟧ ρ * ρ) * ρ ^ j * ρ * ρ ^ i
+  ≈⟨ *-assoc _ ρ (ρ ^ i) ⟩
+    (y + ⟦ xs ⟧ ρ * ρ) * ρ ^ j * ρ ^ suc i
+  ≈⟨  *-assoc _ (ρ ^ j) (ρ ^ suc i) ⟩
+    (y + ⟦ xs ⟧ ρ * ρ) * (ρ ^ j * ρ ^ suc i)
+  ≈⟨ *≫ pow-add ρ j (suc i) ⟩
+    (y + ⟦ xs ⟧ ρ * ρ) * ρ ^ (j ℕ.+ suc i)
+  ∎
+
 +-hom : ∀ xs ys ρ → ⟦ xs ⊞ ys ⟧ ρ ≈ ⟦ xs ⟧ ρ + ⟦ ys ⟧ ρ
 ⊞-ne-hom : ∀ {i j}
          → (c : ℕ.Ordering i j)
@@ -44,14 +81,16 @@ pow-add x (suc i) j =
 ⊞-ne-l-hom : ∀ k xs y ys ρ → ⟦ ⊞-ne-l k xs y ys ⟧ ρ ≈ ⟦ xs ⟧ ρ + ⟦ (k , y) ∷ ys ⟧ ρ
 ⊞-ne-r-hom : ∀ k x xs ys ρ → ⟦ ⊞-ne-r k x xs ys ⟧ ρ ≈ ⟦ (k , x) ∷ xs ⟧ ρ + ⟦ ys ⟧ ρ
 
-⊞-ne-l-hom k [] y ys ρ = sym (+-identityˡ _)
+⊞-ne-l-hom k [] y ys ρ = sym (∷↓-hom (k , y) ys ρ) ︔ sym (+-identityˡ _)
 ⊞-ne-l-hom k ((i , x) ∷ xs) y ys ρ = ⊞-ne-hom (ℕ.compare i k) x xs y ys ρ
 
-⊞-ne-r-hom k x xs [] ρ = sym (+-identityʳ _)
+⊞-ne-r-hom k x xs [] ρ = sym (∷↓-hom (k , x) xs ρ) ︔ sym (+-identityʳ _)
 ⊞-ne-r-hom k x xs ((j , y) ∷ ys) ρ = ⊞-ne-hom (ℕ.compare k j) x xs y ys ρ
 
 ⊞-ne-hom (ℕ.equal i) x xs y ys ρ =
   begin
+    ⟦ (i , x + y) ∷↓ xs ⊞ ys ⟧ ρ
+  ≈⟨ sym (∷↓-hom (i , x + y) (xs ⊞ ys) ρ) ⟩
     ((x + y) + ⟦ xs ⊞ ys ⟧ ρ * ρ) * ρ ^ i
   ≈⟨ ≪* begin
          (x + y) + ⟦ xs ⊞ ys ⟧ ρ * ρ
@@ -77,6 +116,8 @@ pow-add x (suc i) j =
   ∎
 ⊞-ne-hom (ℕ.less i k) x xs y ys ρ =
   begin
+    ⟦ (i , x) ∷↓ ⊞-ne-l k xs y ys ⟧ ρ
+  ≈⟨ sym (∷↓-hom (i , x) (⊞-ne-l k xs y ys) ρ) ⟩
     ⟦ (i , x) ∷ ⊞-ne-l k xs y ys ⟧ ρ
   ≡⟨⟩
     (x + ⟦ ⊞-ne-l k xs y ys ⟧ ρ * ρ) * ρ ^ i
@@ -88,13 +129,15 @@ pow-add x (suc i) j =
     (x + ⟦ xs ⟧ ρ * ρ + ⟦ (k , y) ∷ ys ⟧ ρ * ρ) * ρ ^ i
   ≈⟨ distribʳ (ρ ^ i) _ _ ⟩
     ⟦ (i , x) ∷ xs ⟧ ρ + ⟦ (k , y) ∷ ys ⟧ ρ * ρ * ρ ^ i
-  ≈⟨ +≫ ( *-assoc _ ρ (ρ ^ i) ︔ *-assoc _ (ρ ^ k) (ρ ^ suc i) ︔ *≫ pow-add _ k (suc i) )  ⟩
+  ≈⟨ +≫ (*-assoc _ ρ (ρ ^ i) ︔ *-assoc _ (ρ ^ k) (ρ ^ suc i) ︔ *≫ pow-add _ k (suc i))⟩
     ⟦ (i , x) ∷ xs ⟧ ρ + ⟦ (k ℕ.+ suc i , y) ∷ ys ⟧ ρ
   ≡⟨ ≡.cong (λ ik → ⟦ (i , x) ∷ xs ⟧ ρ + ⟦ (ik , y) ∷ ys ⟧ ρ) (ℕ-≡.+-comm k (suc i)) ⟩
     ⟦ (i , x) ∷ xs ⟧ ρ + ⟦ (suc (i ℕ.+ k) , y) ∷ ys ⟧ ρ
   ∎
 ⊞-ne-hom (ℕ.greater j k) x xs y ys ρ =
   begin
+    ⟦ (j , y) ∷↓ ⊞-ne-r k x xs ys ⟧ ρ
+  ≈⟨ sym (∷↓-hom (j , y) (⊞-ne-r k x xs ys) ρ) ⟩
     ⟦ (j , y) ∷ ⊞-ne-r k x xs ys ⟧ ρ
   ≡⟨⟩
     (y + ⟦ ⊞-ne-r k x xs ys ⟧ ρ * ρ) * ρ ^ j
@@ -127,6 +170,8 @@ pow-add x (suc i) j =
   begin
     ⟦ x ⋊ ((j , y) ∷ ys) ⟧ ρ
   ≡⟨⟩
+    ⟦ (j , x * y) ∷↓ x ⋊ ys ⟧ ρ
+  ≈⟨ sym (∷↓-hom (j , x * y) (x ⋊ ys) ρ) ⟩
     (x * y + ⟦ x ⋊ ys ⟧ ρ * ρ) * ρ ^ j
   ≈⟨ ≪* +≫ ≪* ⋊-hom x ys ρ ⟩
     (x * y + x * ⟦ ys ⟧ ρ * ρ) * ρ ^ j
@@ -145,6 +190,8 @@ pow-add x (suc i) j =
   begin
     ⟦ ((i , x) ∷ xs) ⊠ ((j , y) ∷ ys) ⟧ ρ
   ≡⟨⟩
+    ⟦ (i ℕ.+ j , x * y) ∷↓ x ⋊ ys ⊞ xs ⊠ ((0 , y) ∷ ys) ⟧ ρ
+  ≈⟨ sym (∷↓-hom _ _ ρ) ⟩
     ⟦ (i ℕ.+ j , x * y) ∷ x ⋊ ys ⊞ xs ⊠ ((0 , y) ∷ ys) ⟧ ρ
   ≡⟨⟩
     (x * y + ⟦ x ⋊ ys ⊞ xs ⊠ ((0 , y) ∷ ys) ⟧ ρ * ρ) * ρ ^ (i ℕ.+ j)
@@ -182,7 +229,7 @@ pow-add x (suc i) j =
 κ-hom x ρ =
   begin
     ⟦ κ x ⟧ ρ
-  ≡⟨⟩
+  ≈⟨ sym (∷↓-hom _ _ ρ) ⟩
     (x + 0# * ρ) * ρ ^ 0
   ≈⟨ *-identityʳ _ ⟩
     x + 0# * ρ

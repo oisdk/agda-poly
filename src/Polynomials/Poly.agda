@@ -1,14 +1,14 @@
 open import Algebra using (CommutativeSemiring)
 
-module Polynomials.Poly.Sparse
+module Polynomials.Poly
   {a ℓ}
   (commutativeSemiring : CommutativeSemiring a ℓ)
   where
 
-open import Polynomials.Monomial.Sparse
+open import Polynomials.Mono
   using ()
   renaming (Poly to Mono; _⊞_ to _⊕_; _⊠_ to _⊗_)
-open import Polynomials.Monomial.Sparse.Equality commutativeSemiring
+open import Polynomials.Mono.Equality commutativeSemiring
   renaming (_≋_ to _≋M_)
 
 open CommutativeSemiring commutativeSemiring
