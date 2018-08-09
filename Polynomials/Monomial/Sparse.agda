@@ -5,7 +5,7 @@ module Polynomials.Monomial.Sparse
   (commutativeSemiring : CommutativeSemiring a ℓ)
   where
 
-open CommutativeSemiring commutativeSemiring
+open CommutativeSemiring commutativeSemiring hiding (zero)
 
 open import Data.List as List using (_∷_; []; foldr)
 open import Data.Nat as ℕ using (ℕ; suc; zero)
@@ -46,10 +46,10 @@ _⊠_ : Poly → Poly → Poly
 ((i , x) ∷ xs) ⊠ ((j , y) ∷ ys) = (i ℕ.+ j , x * y) ∷ x ⋊ ys ⊞ xs ⊠ ((0 , y) ∷ ys)
 
 κ : Carrier → Poly
-κ x = (0 ,  x) ∷ []
+κ x = (zero ,  x) ∷ []
 
 ι : Poly
-ι = (1 , 1#) ∷ []
+ι = (suc zero , 1#) ∷ []
 
 ----------------------------------------------------------------------
 -- Evaluation
