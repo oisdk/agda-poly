@@ -25,8 +25,8 @@ _∷↓_ (i , x) with x ≟C 0#
 ... | yes p = pow (suc i)
 ... | no ¬p = _∷_ (i , x)
 
-normalise : Poly → Poly
-normalise = List.foldr _∷↓_ []
+_↓ : Poly → Poly
+_↓ = List.foldr _∷↓_ []
 
 module Homomorphism where
   open import Polynomials.SemiringReasoning commutativeSemiring
@@ -70,10 +70,10 @@ module Homomorphism where
       (y + ⟦ xs ⟧ ρ * ρ) * ρ ^ (j ℕ.+ suc i)
     ∎
 
-  normalise-hom : ∀ xs ρ → ⟦ xs ⟧ ρ ≈ ⟦ normalise xs ⟧ ρ
-  normalise-hom [] ρ = refl
-  normalise-hom ((i , x) ∷ xs) ρ with x ≟C 0#
-  ... | no ¬p = ≪* +≫ ≪* normalise-hom xs ρ
+  ↓-hom : ∀ xs ρ → ⟦ xs ⟧ ρ ≈ ⟦ xs ↓ ⟧ ρ
+  ↓-hom [] ρ = refl
+  ↓-hom ((i , x) ∷ xs) ρ with x ≟C 0#
+  ... | no ¬p = ≪* +≫ ≪* ↓-hom xs ρ
   ... | yes p =
     begin
       ⟦ (i , x) ∷ xs ⟧ ρ
@@ -85,8 +85,8 @@ module Homomorphism where
       (⟦ xs ⟧ ρ * ρ) * ρ ^ i
     ≈⟨ *-assoc _ ρ _ ⟩
       ⟦ xs ⟧ ρ * ρ ^ suc i
-    ≈⟨ ≪* normalise-hom xs ρ ⟩
-      ⟦ normalise xs ⟧ ρ * ρ ^ suc i
-    ≈⟨ pow-hom (suc i) (normalise xs) ρ ⟩
-      ⟦ pow (suc i) (normalise xs) ⟧ ρ
+    ≈⟨ ≪* ↓-hom xs ρ ⟩
+      ⟦ xs ↓ ⟧ ρ * ρ ^ suc i
+    ≈⟨ pow-hom (suc i) (xs ↓) ρ ⟩
+      ⟦ pow (suc i) (xs ↓) ⟧ ρ
     ∎
