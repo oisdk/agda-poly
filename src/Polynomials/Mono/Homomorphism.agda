@@ -243,7 +243,7 @@ pow-hom i ((j , x) ∷ xs) ρ = *-assoc _ (ρ ^ j) (ρ ^ i) ︔ *≫ pow-add ρ 
 ι-hom ρ =
   begin
     ⟦ ι ⟧ ρ
-  ≡⟨⟩
+  ≈⟨ sym (∷↓-hom _ _ ρ) ⟩
     (1# + 0# * ρ) * ρ ^ 1
   ≈⟨ (+≫ zeroˡ ρ ︔ +-identityʳ 1#) ⟨ *-cong ⟩ *-identityʳ ρ ⟩
     1# * ρ
