@@ -27,12 +27,12 @@ data _≋0 : Poly → Set ℓ where
   _∷≋0_ : ∀ {i x xs} → x ≈ 0# → xs ≋0 → ((i , x) ∷ xs) ≋0
 
 
-infixr 5 _∷≋_
+infixr 5 _∷≋_ _∷<≋_ _∷>≋_
 infix 4 _≋_
 data _≋_ : Poly → Poly → Set ℓ where
   _≋0≋_ : ∀ {xs ys} → xs ≋0 → ys ≋0 → xs ≋ ys
-  _∷<≋_ : ∀ {i k x xs y ys} → x ≈ 0# → xs ≋ ys → ((i , x) ∷ xs) ≋ ((ℕ.suc i ℕ.+ k , y) ∷ ys)
-  _∷>≋_ : ∀ {i k x xs y ys} → y ≈ 0# → xs ≋ ys → ((ℕ.suc i ℕ.+ k , x) ∷ xs) ≋ ((i , y) ∷ ys)
+  _∷<≋_ : ∀ {i k xs y yz ys} → yz ≈ 0# → xs ≋ ((ℕ.suc i ℕ.+ k , y) ∷ ys) → xs ≋ ((i , yz) ∷ (k , y) ∷ ys)
+  _∷>≋_ : ∀ {i k x xz xs ys} → xz ≈ 0# → ((ℕ.suc i ℕ.+ k , x) ∷ xs) ≋ ys → ((i , xz) ∷ (k , x) ∷ xs) ≋ ys
   _∷≋_ : ∀ {x y n xs ys} → x ≈ y → xs ≋ ys → ((n , x) ∷ xs) ≋ ((n , y) ∷ ys)
 
 open import Polynomials.SemiringReasoning setoid _+_ _*_ +-cong-C *-cong-C
@@ -57,8 +57,27 @@ open import Function
 
 ⟦_⟧-cong : ∀ {xs ys} → xs ≋ ys → ∀ ρ → ⟦ xs ⟧ ρ ≈ ⟦ ys ⟧ ρ
 ⟦_⟧-cong (xp ≋0≋ yp) ρ = trans-C (≋0-hom xp ρ) (sym-C (≋0-hom yp ρ))
-⟦_⟧-cong {((i , x) ∷ xs)} {((.(suc (i ℕ.+ _)) , y) ∷ ys)} (p ∷<≋ ps) ρ = {!!}
-⟦_⟧-cong {((.(suc (j ℕ.+ _)) , x) ∷ xs)} {((j , y) ∷ ys)} (p ∷>≋ ps) ρ = {!!}
+⟦_⟧-cong {xs} {(i , yz) ∷ (k , y) ∷ ys} (p ∷<≋ ps) ρ =
+  begin
+    ⟦ xs ⟧ ρ
+  ≈⟨ {!!} ⟩
+    (y + ⟦ ys ⟧ ρ * ρ) * (ρ ^ (k ℕ.+ suc i))
+  ≈⟨ sym-C (*≫ pow-add _ _ _) ⟩
+    (y + ⟦ ys ⟧ ρ * ρ) * (ρ ^ k * ρ ^ suc i)
+  ≈⟨ sym-C (*-assoc _ _ _) ⟩
+    ((y + ⟦ ys ⟧ ρ * ρ) * ρ ^ k) * ρ ^ suc i
+  ≡⟨⟩
+    ⟦ (k , y) ∷ ys ⟧ ρ * ρ ^ suc i
+  ≈⟨ sym-C (*-assoc _ ρ _) ⟩
+    (⟦ (k , y) ∷ ys ⟧ ρ * ρ) * ρ ^ i
+  ≈⟨ ≪* sym-C (+-identityˡ _) ⟩
+    (0# + ⟦ (k , y) ∷ ys ⟧ ρ * ρ) * ρ ^ i
+  ≈⟨ sym-C (≪* ≪+ p) ⟩
+    (yz + ⟦ (k , y) ∷ ys ⟧ ρ * ρ) * ρ ^ i
+  ≡⟨⟩
+    ⟦ (i , yz) ∷ (k , y) ∷ ys ⟧ ρ
+  ∎
+⟦_⟧-cong {(i , xz) ∷ (k , x) ∷ xs} {ys} (p ∷>≋ ps) ρ = {!!}
 ⟦_⟧-cong {((i , x) ∷ xs)} {((.i , y) ∷ ys)} (p ∷≋ ps) ρ = {!!}
 
 -- ⟦ x ≋0≋ y ⟧-cong ρ = trans-C (≋0-hom x ρ) (sym-C (≋0-hom y ρ))
