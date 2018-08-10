@@ -55,13 +55,11 @@ open import Function
     0#
   ∎
 
-⟦⟧-cong : ∀ xs ys → xs ≋ ys → ∀ ρ → ⟦ xs ⟧ ρ ≈ ⟦ ys ⟧ ρ
-⟦⟧-cong [] ys (x ≋0≋ x₁) ρ = {!!}
-⟦⟧-cong (x ∷ xs) [] (x₁ ≋0≋ x₂) ρ = {!!}
-⟦⟧-cong ((i , x) ∷ xs) ((j , y) ∷ ys) (x₁ ≋0≋ x₂) ρ = {!!}
-⟦⟧-cong ((i , x) ∷ xs) ((.(suc (i ℕ.+ _)) , y) ∷ ys) (x₁ ∷<≋ ps) ρ = {!!}
-⟦⟧-cong ((.(suc (j ℕ.+ _)) , x) ∷ xs) ((j , y) ∷ ys) (x₁ ∷>≋ ps) ρ = {!!}
-⟦⟧-cong ((i , x) ∷ xs) ((.i , y) ∷ ys) (x₁ ∷≋ ps) ρ = {!!}
+⟦_⟧-cong : ∀ {xs ys} → xs ≋ ys → ∀ ρ → ⟦ xs ⟧ ρ ≈ ⟦ ys ⟧ ρ
+⟦_⟧-cong (xp ≋0≋ yp) ρ = trans-C (≋0-hom xp ρ) (sym-C (≋0-hom yp ρ))
+⟦_⟧-cong {((i , x) ∷ xs)} {((.(suc (i ℕ.+ _)) , y) ∷ ys)} (p ∷<≋ ps) ρ = {!!}
+⟦_⟧-cong {((.(suc (j ℕ.+ _)) , x) ∷ xs)} {((j , y) ∷ ys)} (p ∷>≋ ps) ρ = {!!}
+⟦_⟧-cong {((i , x) ∷ xs)} {((.i , y) ∷ ys)} (p ∷≋ ps) ρ = {!!}
 
 -- ⟦ x ≋0≋ y ⟧-cong ρ = trans-C (≋0-hom x ρ) (sym-C (≋0-hom y ρ))
 -- ⟦_⟧-cong {(i , x) ∷ xs} {(j , y) ∷ ys} (p ∷<≋ ps) ρ = {!!}
