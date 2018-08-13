@@ -55,29 +55,31 @@ open import Function
     0#
   ∎
 
+open import Polynomials.Mono.Homomorphism commutativeSemiring _≟C_ using (pow-add)
+import Relation.Binary.PropositionalEquality as ≡
+import Data.Nat.Properties as ℕ-≡
+
 ⟦_⟧-cong : ∀ {xs ys} → xs ≋ ys → ∀ ρ → ⟦ xs ⟧ ρ ≈ ⟦ ys ⟧ ρ
 ⟦_⟧-cong (xp ≋0≋ yp) ρ = trans-C (≋0-hom xp ρ) (sym-C (≋0-hom yp ρ))
-⟦_⟧-cong {xs} {(i , yz) ∷ (k , y) ∷ ys} (p ∷<≋ ps) ρ =
+⟦_⟧-cong {xs} {(i , yz) ∷ (k , y) ∷ ys} (p ∷<≋ ps) ρ = {!!}
+⟦_⟧-cong {(i , xz) ∷ (k , x) ∷ xs} {ys} (p ∷>≋ ps) ρ =
   begin
-    ⟦ xs ⟧ ρ
-  ≈⟨ {!!} ⟩
-    (y + ⟦ ys ⟧ ρ * ρ) * (ρ ^ (k ℕ.+ suc i))
-  ≈⟨ sym-C (*≫ pow-add _ _ _) ⟩
-    (y + ⟦ ys ⟧ ρ * ρ) * (ρ ^ k * ρ ^ suc i)
-  ≈⟨ sym-C (*-assoc _ _ _) ⟩
-    ((y + ⟦ ys ⟧ ρ * ρ) * ρ ^ k) * ρ ^ suc i
+    ⟦ (i , xz) ∷ (k , x) ∷ xs ⟧ ρ
   ≡⟨⟩
-    ⟦ (k , y) ∷ ys ⟧ ρ * ρ ^ suc i
-  ≈⟨ sym-C (*-assoc _ ρ _) ⟩
-    (⟦ (k , y) ∷ ys ⟧ ρ * ρ) * ρ ^ i
-  ≈⟨ ≪* sym-C (+-identityˡ _) ⟩
-    (0# + ⟦ (k , y) ∷ ys ⟧ ρ * ρ) * ρ ^ i
-  ≈⟨ sym-C (≪* ≪+ p) ⟩
-    (yz + ⟦ (k , y) ∷ ys ⟧ ρ * ρ) * ρ ^ i
+    (xz + ⟦ (k , x) ∷ xs ⟧ ρ * ρ) * ρ ^ i
+  ≈⟨ ≪* (≪+ p ︔ +-identityˡ _) ⟩
+    (⟦ (k , x) ∷ xs ⟧ ρ * ρ) * ρ ^ i
+  ≈⟨ *-assoc _ ρ _ ⟩
+    ⟦ (k , x) ∷ xs ⟧ ρ * ρ ^ suc i
   ≡⟨⟩
-    ⟦ (i , yz) ∷ (k , y) ∷ ys ⟧ ρ
+    (x + ⟦ xs ⟧ ρ * ρ) * ρ ^ k * ρ ^ suc i
+  ≈⟨ *-assoc _ _ _ ︔ *≫ pow-add ρ k (suc i) ⟩
+    (x + ⟦ xs ⟧ ρ * ρ) * ρ ^ (k ℕ.+ suc i)
+  ≡⟨ ≡.cong (λ ki → (x + ⟦ xs ⟧ ρ * ρ) * ρ ^ ki) (ℕ-≡.+-comm k (suc i) ) ⟩
+    (x + ⟦ xs ⟧ ρ * ρ) * ρ ^ (suc i ℕ.+ k)
+  ≈⟨ ⟦ ps ⟧-cong ρ ⟩
+    ⟦ ys ⟧ ρ
   ∎
-⟦_⟧-cong {(i , xz) ∷ (k , x) ∷ xs} {ys} (p ∷>≋ ps) ρ = {!!}
 ⟦_⟧-cong {((i , x) ∷ xs)} {((.i , y) ∷ ys)} (p ∷≋ ps) ρ = {!!}
 
 -- ⟦ x ≋0≋ y ⟧-cong ρ = trans-C (≋0-hom x ρ) (sym-C (≋0-hom y ρ))
