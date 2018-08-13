@@ -61,7 +61,24 @@ import Data.Nat.Properties as ℕ-≡
 
 ⟦_⟧-cong : ∀ {xs ys} → xs ≋ ys → ∀ ρ → ⟦ xs ⟧ ρ ≈ ⟦ ys ⟧ ρ
 ⟦_⟧-cong (xp ≋0≋ yp) ρ = trans-C (≋0-hom xp ρ) (sym-C (≋0-hom yp ρ))
-⟦_⟧-cong {xs} {(i , yz) ∷ (k , y) ∷ ys} (p ∷<≋ ps) ρ = {!!}
+⟦_⟧-cong {xs} {(i , yz) ∷ (k , y) ∷ ys} (p ∷<≋ ps) ρ = sym-C $
+  begin
+    ⟦ (i , yz) ∷ (k , y) ∷ ys ⟧ ρ
+  ≡⟨⟩
+    (yz + ⟦ (k , y) ∷ ys ⟧ ρ * ρ) * ρ ^ i
+  ≈⟨ ≪* (≪+ p ︔ +-identityˡ _) ⟩
+    (⟦ (k , y) ∷ ys ⟧ ρ * ρ) * ρ ^ i
+  ≈⟨ *-assoc _ ρ _ ⟩
+    ⟦ (k , y) ∷ ys ⟧ ρ * ρ ^ suc i
+  ≡⟨⟩
+    (y + ⟦ ys ⟧ ρ * ρ) * ρ ^ k * ρ ^ suc i
+  ≈⟨ *-assoc _ _ _ ︔ *≫ pow-add ρ k (suc i) ⟩
+    (y + ⟦ ys ⟧ ρ * ρ) * ρ ^ (k ℕ.+ suc i)
+  ≡⟨ ≡.cong (λ ki → (y + ⟦ ys ⟧ ρ * ρ) * ρ ^ ki) (ℕ-≡.+-comm k (suc i) ) ⟩
+    (y + ⟦ ys ⟧ ρ * ρ) * ρ ^ (suc i ℕ.+ k)
+  ≈⟨ sym-C (⟦ ps ⟧-cong ρ) ⟩
+    ⟦ xs ⟧ ρ
+  ∎
 ⟦_⟧-cong {(i , xz) ∷ (k , x) ∷ xs} {ys} (p ∷>≋ ps) ρ =
   begin
     ⟦ (i , xz) ∷ (k , x) ∷ xs ⟧ ρ
@@ -80,7 +97,14 @@ import Data.Nat.Properties as ℕ-≡
   ≈⟨ ⟦ ps ⟧-cong ρ ⟩
     ⟦ ys ⟧ ρ
   ∎
-⟦_⟧-cong {((i , x) ∷ xs)} {((.i , y) ∷ ys)} (p ∷≋ ps) ρ = {!!}
+⟦_⟧-cong {((i , x) ∷ xs)} {((.i , y) ∷ ys)} (p ∷≋ ps) ρ =
+  begin
+    ⟦ (i , x) ∷ xs ⟧ ρ
+  ≡⟨⟩
+    (x + ⟦ xs ⟧ ρ * ρ) * ρ ^ i
+  ≈⟨ ≪* (p ⟨ +-cong-C ⟩ (≪* ⟦ ps ⟧-cong ρ)) ⟩
+    ⟦ (i , y) ∷ ys ⟧ ρ
+  ∎
 
 -- ⟦ x ≋0≋ y ⟧-cong ρ = trans-C (≋0-hom x ρ) (sym-C (≋0-hom y ρ))
 -- ⟦_⟧-cong {(i , x) ∷ xs} {(j , y) ∷ ys} (p ∷<≋ ps) ρ = {!!}
