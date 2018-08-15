@@ -28,7 +28,6 @@ record Coefficient : Set (a ⊔ ℓ) where
     expon : ℕ
     .coeff≠0 : coeff ≉0
 
-
 Poly : Set (a ⊔ ℓ)
 Poly = List Coefficient
 
