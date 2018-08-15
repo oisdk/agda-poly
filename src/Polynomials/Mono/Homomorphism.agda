@@ -61,10 +61,10 @@ pow-hom i ((x ^ j ⦅ _ ⦆) ∷ xs) ρ = *-assoc _ (ρ ^ j) (ρ ^ i) ︔ *≫ p
 
 ⊞-ne-hom : ∀ {i j}
          → (c : ℕ.Ordering i j)
-         → ∀ x → .(x≠0 : x ≉ 0#) → ∀ xs y → .(y≠0 : y ≉ 0#) → ∀ ys ρ
+         → ∀ x → .(x≠0 : x ≉0) → ∀ xs y → .(y≠0 : y ≉0) → ∀ ys ρ
          → ⟦ ⊞-ne c x x≠0 xs y y≠0 ys ⟧ ρ ≈ ⟦ ((x ^ i ⦅ x≠0 ⦆) ∷ xs) ⟧ ρ + ⟦ (y ^ j ⦅ y≠0 ⦆) ∷ ys ⟧ ρ
-⊞-ne-l-hom : ∀ k xs y → .(y≠0 : y ≉ 0#) → ∀ ys ρ → ⟦ ⊞-ne-l k xs y y≠0 ys ⟧ ρ ≈ ⟦ xs ⟧ ρ + ⟦ (y ^ k ⦅ y≠0 ⦆) ∷ ys ⟧ ρ
-⊞-ne-r-hom : ∀ k x → .(x≠0 : x ≉ 0#) → ∀ xs ys ρ → ⟦ ⊞-ne-r k x x≠0 xs ys ⟧ ρ ≈ ⟦ (x ^ k ⦅ x≠0 ⦆) ∷ xs ⟧ ρ + ⟦ ys ⟧ ρ
+⊞-ne-l-hom : ∀ k xs y → .(y≠0 : y ≉0) → ∀ ys ρ → ⟦ ⊞-ne-l k xs y y≠0 ys ⟧ ρ ≈ ⟦ xs ⟧ ρ + ⟦ (y ^ k ⦅ y≠0 ⦆) ∷ ys ⟧ ρ
+⊞-ne-r-hom : ∀ k x → .(x≠0 : x ≉0) → ∀ xs ys ρ → ⟦ ⊞-ne-r k x x≠0 xs ys ⟧ ρ ≈ ⟦ (x ^ k ⦅ x≠0 ⦆) ∷ xs ⟧ ρ + ⟦ ys ⟧ ρ
 
 ⊞-ne-l-hom k [] y y≠0 ys ρ = sym (+-identityˡ _)
 ⊞-ne-l-hom k ((x ^ i ⦅ x≠0 ⦆) ∷ xs) y y≠0 ys ρ = ⊞-ne-hom (ℕ.compare i k) x x≠0 xs y y≠0 ys ρ

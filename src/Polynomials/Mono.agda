@@ -17,13 +17,16 @@ open import Data.Nat as ℕ using (ℕ; suc; zero)
 open import Data.Product
 open import Polynomials.SemiringReasoning setoid _+_ _*_ +-cong *-cong
 
+_≉0 : Carrier → Set ℓ
+x ≉0 = x ≉ 0#
+
 infixr 9 _^_⦅_⦆
 record Coefficient : Set (a ⊔ ℓ) where
   constructor _^_⦅_⦆
   field
     coeff : Carrier
     expon : ℕ
-    .coeff≠0 : coeff ≉ 0#
+    .coeff≠0 : coeff ≉0
 
 
 Poly : Set (a ⊔ ℓ)
@@ -42,9 +45,9 @@ _∷↓_ : Carrier × ℕ → Poly → Poly
 
 infixl 6 _⊞_
 _⊞_ : Poly → Poly → Poly
-⊞-ne : ∀ {i j} → ℕ.Ordering i j → (x : Carrier) → .(x ≉ 0#) → Poly → (y : Carrier) → .(y ≉ 0#) → Poly → Poly
-⊞-ne-l : ℕ → Poly → (y : Carrier) → .(y ≉ 0#) → Poly → Poly
-⊞-ne-r : ℕ → (x : Carrier) → .(x ≉ 0#) → Poly → Poly → Poly
+⊞-ne : ∀ {i j} → ℕ.Ordering i j → (x : Carrier) → .(x ≉0) → Poly → (y : Carrier) → .(y ≉0) → Poly → Poly
+⊞-ne-l : ℕ → Poly → (y : Carrier) → .(y ≉0) → Poly → Poly
+⊞-ne-r : ℕ → (x : Carrier) → .(x ≉0) → Poly → Poly → Poly
 
 [] ⊞ ys = ys
 (x ∷ xs) ⊞ [] = x ∷ xs
