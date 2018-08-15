@@ -7,12 +7,9 @@ module Polynomials.Mono.Instances
   (_≟C_ : Decidable (CommutativeSemiring._≈_ commutativeSemiring))
   where
 
+open import Level using (_⊔_)
 open import Polynomials.Mono commutativeSemiring _≟C_
 open import Polynomials.Mono.Equality commutativeSemiring _≟C_
-open import Polynomials.Mono.Homomorphism commutativeSemiring _≟C_
-open import Data.List using ([]; _∷_)
-open import Relation.Binary
-open import Level using (_⊔_)
 
 mono-setoid : Setoid (a ⊔ ℓ) ℓ
 mono-setoid = record
@@ -20,3 +17,11 @@ mono-setoid = record
   ; _≈_ = _≋_
   ; isEquivalence = ≋-isEquivalence
   }
+
+open import Algebra.FunctionProperties _≋_
+open import Data.List as List using ([]; _∷_)
+
++-cong : Congruent₂ _⊞_
++-cong []≋ yp = yp
++-cong (xp ∷≋ xps) []≋ = xp ∷≋ xps
++-cong (_∷≋_ {n = i} xp xps) (_∷≋_ {n = j} yp yps) = {!!}
