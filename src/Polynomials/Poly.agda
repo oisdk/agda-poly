@@ -53,10 +53,14 @@ x ^ suc n = x * x ^ n
 
 open import Data.Vec as Vec using (Vec; _∷_; [])
 
-coeff-eval : ∀ {n} → Vec Carrier (suc n) → Coeff n → Carrier → Carrier
-
 ⟦_⟧ : ∀ {n} → Poly n → Vec Carrier n → Carrier
 ⟦ Κ x ⟧ [] = x
-⟦ Ι x ⟧ ρ = List.foldr (coeff-eval ρ) 0# x
+⟦_⟧ {suc n} (Ι x) (y ∷ ρ) = List.foldr coeff-eval 0# x
+  where
+  ⟦_⟧-vec : ∀ {m} → Poly m → ∀ n → Vec Carrier (n ℕ.+ m) → Carrier
+  ⟦ p ⟧-vec zero xs = ⟦ p ⟧ xs
+  ⟦ p ⟧-vec (suc n) (_ ∷ xs) = ⟦ p ⟧-vec n xs
 
-coeff-eval (y ∷ ρ) (coeff i x _ _ p) xs = (⟦ x ⟧ (Vec.drop i ρ) + xs * y) * y ^ p
+  coeff-eval : Coeff n → Carrier → Carrier
+  coeff-eval (coeff i c _ _ p) xs = (⟦ c ⟧-vec i ρ + xs * y) * y ^ p
+
