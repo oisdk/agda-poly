@@ -2,9 +2,9 @@ open import Algebra using (CommutativeSemiring)
 open import Relation.Binary
 open import Relation.Nullary.Decidable
 open import Relation.Nullary
-open import Level using (_⊔_; Lift)
+open import Level using (_⊔_; Lift; lift; lower)
 open import Data.Empty
-open import Data.Unit using (⊤)
+open import Data.Unit using (⊤; tt)
 
 module Polynomials.Poly
   {a ℓ}
@@ -25,10 +25,15 @@ data Poly : ℕ → Set (a ⊔ ℓ) where
   Κ : Carrier → Poly 0
   Ι : ∀ {n} → List (Coeff n) → Poly (suc n)
 
-NonZero : ∀ {n} → Poly n → Set ℓ
-NonZero (Κ x) = ¬ (x ≈ 0#)
-NonZero (Ι []) = Lift ℓ ⊥
-NonZero (Ι (x ∷ xs)) = Lift ℓ ⊤
+Zero : ∀ {n} → Poly n → Set ℓ
+Zero (Κ x) = x ≈ 0#
+Zero (Ι []) = Lift ℓ ⊤
+Zero (Ι (x ∷ xs)) = Lift ℓ ⊥
+
+zero? : ∀ {n} → (p : Poly n) → Dec (Zero p)
+zero? (Κ x) = x ≟C 0#
+zero? (Ι []) = yes (lift tt)
+zero? (Ι (x ∷ xs)) = no lower
 
 -- Bit of a misnomer. Avoids constant polys,
 -- allows constant (as in Κ).
@@ -38,10 +43,16 @@ NonConst (Ι []) = ⊥
 NonConst (Ι (_ ∷ [])) = ⊥
 NonConst (Ι (_ ∷ _ ∷ _)) = ⊤
 
+nonConst? : ∀ {n} → (p : Poly n) → Dec (NonConst p)
+nonConst? (Κ x) = yes tt
+nonConst? (Ι []) = no (λ z → z)
+nonConst? (Ι (_ ∷ [])) = no (λ z → z)
+nonConst? (Ι (_ ∷ _ ∷ _)) = yes tt
+
 data Coeff where
   coeff : ∀ i {j}
         → (c : Poly j)
-        → .(NonZero c)
+        → .(¬ Zero c)
         → .(NonConst c)
         → ℕ
         → Coeff (i ℕ.+ j)
