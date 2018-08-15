@@ -12,17 +12,11 @@ open import Polynomials.Mono.Equality commutativeSemiring _≟C_
 open import Polynomials.Mono.Homomorphism commutativeSemiring _≟C_
 open import Data.List using ([]; _∷_)
 open import Relation.Binary
+open import Level using (_⊔_)
 
-mono-setoid : Setoid a ℓ
+mono-setoid : Setoid (a ⊔ ℓ) ℓ
 mono-setoid = record
   { Carrier = Poly
   ; _≈_ = _≋_
-  ; isEquivalence = ≋-equivalence
+  ; isEquivalence = ≋-isEquivalence
   }
-
-open import Polynomials.SemiringReasoning mono-setoid _⊞_ _⊠_ {!!} {!!}
-
-+-comm : ∀ xs ys → xs ⊞ ys ≋ ys ⊞ xs
-+-comm [] [] = []≋
-+-comm [] (x ∷ ys) = {!!}
-+-comm (x ∷ xs) ys = {!!}
