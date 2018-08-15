@@ -73,6 +73,13 @@ open import Data.Empty
 ⍓-cong []≋ = []≋
 ⍓-cong (p ∷≋ ps) = p ∷≋ ps
 
+∷↓-cong : ∀ {x₁ x₂ i xs₁ xs₂} → x₁ ≈C x₂ → xs₁ ≋ xs₂ → (x₁ , i) ∷↓ xs₁ ≋ (x₂ , i) ∷↓ xs₂
+∷↓-cong {x₁} {x₂} xp xps with x₁ ≟C 0# | x₂ ≟C 0#
+∷↓-cong {x₁} {x₂} xp xps | yes _ | yes _ = ⍓-cong xps
+∷↓-cong {x₁} {x₂} xp xps | yes p | no ¬p = ⊥-elim (¬p (trans-C (sym-C xp) p))
+∷↓-cong {x₁} {x₂} xp xps | no ¬p | yes p = ⊥-elim (¬p (trans-C xp p))
+∷↓-cong {x₁} {x₂} xp xps | no  _ | no  _ = xp ∷≋ xps
+
 
 ⊞-cong : Congruent₂ _⊞_
 ⊞-ne-l-cong : ∀ {k xs₁ xs₂ y₁ y₂ ys₁ ys₂} → .{y₁≠0 : y₁ ≉0} → .{y₂≠0 : y₂ ≉0} → xs₁ ≋ xs₂ → y₁ ≈C y₂ → ys₁ ≋ ys₂ → ⊞-ne-l k xs₁ y₁ y₁≠0 ys₁ ≋ ⊞-ne-l k xs₂ y₂ y₂≠0 ys₂
@@ -80,7 +87,7 @@ open import Data.Empty
 
 ⊞-ne-cong : ∀ {i j}
           → (c : ℕ.Ordering i j)
-          → ∀ {x₁ xs₁ y₁ ys₁ x₂ xs₂ y₂ ys₂}
+          → ∀ {x₁ y₁ x₂ y₂ xs₁ ys₁ xs₂ ys₂}
           → .{x₁≠0 : x₁ ≉0}
           → .{x₂≠0 : x₂ ≉0}
           → .{y₁≠0 : y₁ ≉0}
@@ -92,7 +99,7 @@ open import Data.Empty
           → ⊞-ne c x₁ x₁≠0 xs₁ y₁ y₁≠0 ys₁ ≋ ⊞-ne c x₂ x₂≠0 xs₂ y₂ y₂≠0 ys₂
 ⊞-ne-cong (ℕ.less m k) xp xps yp yps = xp ∷≋ ⊞-ne-l-cong xps yp yps
 ⊞-ne-cong (ℕ.greater m k) xp xps yp yps = yp ∷≋ ⊞-ne-r-cong xp xps yps
-⊞-ne-cong (ℕ.equal i) {x₁} {xs₁} {y₁} {ys₁} {x₂} {xs₂} {y₂} {ys₂} {x₁≠0} {x₂≠0} {y₁≠0} {y₂≠0} xp xps yp yps with (x₁ + y₁) ≟C 0# | (x₂ + y₂) ≟C 0#
+⊞-ne-cong (ℕ.equal i) {x₁} {y₁} {x₂} {y₂} xp xps yp yps with (x₁ + y₁) ≟C 0# | (x₂ + y₂) ≟C 0#
 ... | yes p | yes p₁ = ⍓-cong (⊞-cong xps yps)
 ... | yes p | no ¬p = ⊥-elim (¬p (trans-C (sym-C (+-cong-C xp yp)) p))
 ... | no ¬p | yes p = ⊥-elim (¬p (trans-C (+-cong-C xp yp) p))
@@ -107,3 +114,4 @@ open import Data.Empty
 ⊞-cong []≋ yp = yp
 ⊞-cong (xp ∷≋ xps) []≋ = xp ∷≋ xps
 ⊞-cong (_∷≋_ {i} xp xps) (_∷≋_ {j} yp yps) = ⊞-ne-cong (ℕ.compare i j) xp xps yp yps
+
