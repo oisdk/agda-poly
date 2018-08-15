@@ -31,4 +31,6 @@ _≟_ : Decidable _≋_
 [] ≟ [] = yes λ ρ → refl
 [] ≟ (x ∷ ys) = no {!!}
 (x ∷ xs) ≟ [] = no {!!}
-(x ∷ xs) ≟ (y ∷ ys) = {!!}
+(x ∷ xs) ≟ (y ∷ ys) with xs ≟ ys
+((x ∷ xs) ≟ (y ∷ ys)) | yes p = {!!}
+((x ∷ xs) ≟ (y ∷ ys)) | no ¬p = {!!}
