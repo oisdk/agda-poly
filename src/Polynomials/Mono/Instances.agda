@@ -7,21 +7,34 @@ module Polynomials.Mono.Instances
   (_≟C_ : Decidable (CommutativeSemiring._≈_ commutativeSemiring))
   where
 
-open import Level using (_⊔_)
 open import Polynomials.Mono commutativeSemiring _≟C_
 open import Polynomials.Mono.Equality commutativeSemiring _≟C_
+open import Polynomials.SemiringReasoning ≋-setoid _⊞_ _⊠_ ⊞-cong ⊠-cong
+open import Data.List as List using ([]; List; _∷_)
+open CommutativeSemiring commutativeSemiring
+open import Data.Product
+open import Relation.Nullary
 
-mono-setoid : Setoid (a ⊔ ℓ) ℓ
-mono-setoid = record
-  { Carrier = Poly
-  ; _≈_ = _≋_
-  ; isEquivalence = ≋-isEquivalence
-  }
+⊞-identityˡ : ∀ xs → [] ⊞ xs ≋ xs
+⊞-identityˡ xs = ≋-refl
 
-open import Algebra.FunctionProperties _≋_
-open import Data.List as List using ([]; _∷_)
+⊞-assoc : ∀ xs ys zs → (xs ⊞ ys) ⊞ zs ≋ xs ⊞ (ys ⊞ zs)
+⊞-assoc [] ys zs = ≋-refl
+⊞-assoc (x ∷ xs) [] zs = ≋-refl
+⊞-assoc (x ∷ xs) (y ∷ ys) [] = {! !}
+⊞-assoc (x ∷ xs) (y ∷ ys) (z ∷ zs) = {!!}
 
-+-cong : Congruent₂ _⊞_
-+-cong []≋ yp = yp
-+-cong (xp ∷≋ xps) []≋ = xp ∷≋ xps
-+-cong (_∷≋_ {n = i} xp xps) (_∷≋_ {n = j} yp yps) = {!!}
+⊞-comm : ∀ xs ys → xs ⊞ ys ≋ ys ⊞ xs
+⊞-comm [] [] = []≋
+⊞-comm [] (x ∷ ys) = ≋-refl
+⊞-comm (x ∷ xs) [] = ≋-refl
+⊞-comm (x ∷ xs) (y ∷ ys) = {!!}
+
+⊠-identityˡ-nz : ∀ xs → .{1≠0 : 1# ≉0} → (1# ^^ 0 ⦅ 1≠0 ⦆ ∷ []) ⊠ xs ≋ xs
+⊠-identityˡ-nz [] = []≋
+⊠-identityˡ-nz (x ∷ xs) = {!!}
+
+⊠-identityˡ : ∀ xs → ((1# , 0) ∷↓ []) ⊠ xs ≋ xs
+⊠-identityˡ xs with 1# ≟C 0#
+⊠-identityˡ xs | no ¬p = {!!}
+⊠-identityˡ xs | yes p = {!!}
