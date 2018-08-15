@@ -22,12 +22,9 @@ open import Algebra.FunctionProperties
 open import Data.Nat as ℕ using (ℕ; suc)
 open import Relation.Binary.PropositionalEquality as ≡ using (_≡_)
 
-⟦_⟧↕ : Poly → Set a
-⟦ xs ⟧↕ = xs ≡ List.foldr _∷↓_ [] xs
-
 infixr 5 _∷≋_
 infix 4 _≋_
-data _≋_ : Poly → Poly → Set ℓ where
+data _≋_ : Poly → Poly → Set (a ⊔ ℓ) where
   []≋ : [] ≋ []
   _∷≋_ : ∀ {x y n xs ys} → x ≈ y → xs ≋ ys → ((n , x) ∷ xs) ≋ ((n , y) ∷ ys)
 

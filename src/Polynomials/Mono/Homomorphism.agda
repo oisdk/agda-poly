@@ -39,49 +39,16 @@ pow-add x (suc i) j =
     x ^ suc (i ℕ.+ j)
   ∎
 
-pow-hom : ∀ i xs ρ → ⟦ xs ⟧ ρ * ρ ^ i ≈ ⟦ pow i xs ⟧ ρ
+pow-hom : ∀ i xs ρ → ⟦ xs ⟧ ρ * ρ ^ i ≈ ⟦ xs ⍓ i ⟧ ρ
 pow-hom i [] ρ = zeroˡ (ρ ^ i)
 pow-hom i ((x ^ j ⦅ _ ⦆) ∷ xs) ρ = *-assoc _ (ρ ^ j) (ρ ^ i) ︔ *≫ pow-add ρ j i
-
--- unzero : Coefficient → Carrier × ℕ
--- unzero (x ^ i ⦅ _ ⦆) = x , i
-
--- ∷↓-∷-hom : ∀ x xs ρ → ⟦ x ∷ xs ⟧ ρ ≈ ⟦ unzero x ∷↓ xs ⟧ ρ
--- ∷↓-∷-hom (x ^ i ⦅ x≠0 ⦆) xs ρ with x ≟C 0#
--- ∷↓-∷-hom (x ^ i ⦅ x≠0 ⦆) xs ρ | no ¬p = refl
--- ∷↓-∷-hom (x ^ i ⦅ x≠0 ⦆) [] ρ | yes p =
---   begin
---     (x + 0# * ρ) * ρ ^ i
---   ≈⟨ ≪* (p ⟨ +-cong ⟩ zeroˡ ρ) ⟩
---     (0# + 0#) * ρ ^ i
---   ≈⟨ (≪* +-identityʳ 0#) ⟩
---     0# * ρ ^ i
---   ≈⟨ zeroˡ (ρ ^ i) ⟩
---     0#
---   ∎
--- ∷↓-∷-hom (x ^ i ⦅ x≠0 ⦆) (y ^ j ⦅ _ ⦆ ∷ xs) ρ | yes p =
---   begin
---     (x + (y + ⟦ xs ⟧ ρ * ρ) * ρ ^ j * ρ) * ρ ^ i
---   ≈⟨ distribʳ (ρ ^ i) x _ ⟩
---     x * ρ ^ i + (y + ⟦ xs ⟧ ρ * ρ) * ρ ^ j * ρ * ρ ^ i
---   ≈⟨ ≪+ (≪* p ︔ zeroˡ (ρ ^ i)) ⟩
---     0# + (y + ⟦ xs ⟧ ρ * ρ) * ρ ^ j * ρ * ρ ^ i
---   ≈⟨ +-identityˡ _ ⟩
---     (y + ⟦ xs ⟧ ρ * ρ) * ρ ^ j * ρ * ρ ^ i
---   ≈⟨ *-assoc _ ρ (ρ ^ i) ⟩
---     (y + ⟦ xs ⟧ ρ * ρ) * ρ ^ j * ρ ^ suc i
---   ≈⟨  *-assoc _ (ρ ^ j) (ρ ^ suc i) ⟩
---     (y + ⟦ xs ⟧ ρ * ρ) * (ρ ^ j * ρ ^ suc i)
---   ≈⟨ *≫ pow-add ρ j (suc i) ⟩
---     (y + ⟦ xs ⟧ ρ * ρ) * ρ ^ (j ℕ.+ suc i)
---   ∎
 
 ∷↓-hom : ∀ x i xs ρ → ⟦ (x , i) ∷↓ xs ⟧ ρ ≈ (x + ⟦ xs ⟧ ρ * ρ) * ρ ^ i
 ∷↓-hom x i xs ρ with x ≟C 0#
 ∷↓-hom x i xs ρ | no ¬p = refl
 ∷↓-hom x i xs ρ | yes p =
   begin
-    ⟦ pow (suc i) xs ⟧ ρ
+    ⟦ xs ⍓ suc i ⟧ ρ
   ≈⟨ sym (pow-hom _ xs ρ) ⟩
     ⟦ xs ⟧ ρ * ρ ^ (suc i)
   ≈⟨ sym (*-assoc _ ρ _) ⟩

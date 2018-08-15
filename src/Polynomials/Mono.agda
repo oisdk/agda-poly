@@ -15,10 +15,7 @@ open CommutativeSemiring commutativeSemiring hiding (zero)
 open import Data.List as List using (_∷_; []; foldr; List)
 open import Data.Nat as ℕ using (ℕ; suc; zero)
 open import Data.Product
-
-infix 4 _≉_
-_≉_ : Carrier → Carrier → Set ℓ
-x ≉ y = ¬ (x ≈ y)
+open import Polynomials.SemiringReasoning setoid _+_ _*_ +-cong *-cong
 
 infixr 9 _^_⦅_⦆
 record Coefficient : Set (a ⊔ ℓ) where
@@ -32,15 +29,16 @@ record Coefficient : Set (a ⊔ ℓ) where
 Poly : Set (a ⊔ ℓ)
 Poly = List Coefficient
 
-pow : ℕ → Poly → Poly
-pow i [] = []
-pow i (x ^ j ⦅ x≠0 ⦆ ∷ xs) = (x ^ j ℕ.+ i ⦅ x≠0 ⦆) ∷ xs
+infixr 8 _⍓_
+_⍓_ : Poly → ℕ → Poly
+[] ⍓ i = []
+(x ^ j ⦅ x≠0 ⦆ ∷ xs) ⍓ i = (x ^ j ℕ.+ i ⦅ x≠0 ⦆) ∷ xs
 
 infixr 5 _∷↓_
 _∷↓_ : Carrier × ℕ → Poly → Poly
-_∷↓_ (x , i) with x ≟C 0#
-... | yes p = pow (suc i)
-... | no ¬p = x ^ i ⦅ ¬p ⦆ ∷_
+(x , i) ∷↓ xs with x ≟C 0#
+... | yes p = xs ⍓ suc i
+... | no ¬p = x ^ i ⦅ ¬p ⦆ ∷ xs
 
 infixl 6 _⊞_
 _⊞_ : Poly → Poly → Poly
