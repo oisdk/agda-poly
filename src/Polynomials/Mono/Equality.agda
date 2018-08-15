@@ -75,39 +75,58 @@ open import Data.Empty
 
 ∷↓-cong : ∀ {x₁ x₂ i xs₁ xs₂} → x₁ ≈C x₂ → xs₁ ≋ xs₂ → (x₁ , i) ∷↓ xs₁ ≋ (x₂ , i) ∷↓ xs₂
 ∷↓-cong {x₁} {x₂} xp xps with x₁ ≟C 0# | x₂ ≟C 0#
-∷↓-cong {x₁} {x₂} xp xps | yes _ | yes _ = ⍓-cong xps
-∷↓-cong {x₁} {x₂} xp xps | yes p | no ¬p = ⊥-elim (¬p (trans-C (sym-C xp) p))
-∷↓-cong {x₁} {x₂} xp xps | no ¬p | yes p = ⊥-elim (¬p (trans-C xp p))
-∷↓-cong {x₁} {x₂} xp xps | no  _ | no  _ = xp ∷≋ xps
-
+... | yes _ | yes _ = ⍓-cong xps
+... | yes p | no ¬p = ⊥-elim (¬p (trans-C (sym-C xp) p))
+... | no ¬p | yes p = ⊥-elim (¬p (trans-C xp p))
+... | no  _ | no  _ = xp ∷≋ xps
 
 ⊞-cong : Congruent₂ _⊞_
-⊞-ne-l-cong : ∀ {k xs₁ xs₂ y₁ y₂ ys₁ ys₂} → .{y₁≠0 : y₁ ≉0} → .{y₂≠0 : y₂ ≉0} → xs₁ ≋ xs₂ → y₁ ≈C y₂ → ys₁ ≋ ys₂ → ⊞-ne-l k xs₁ y₁ y₁≠0 ys₁ ≋ ⊞-ne-l k xs₂ y₂ y₂≠0 ys₂
-⊞-ne-r-cong : ∀ {k x₁ xs₁ ys₁ x₂ xs₂ ys₂} → .{x₁≠0 : x₁ ≉0} → .{x₂≠0 : x₂ ≉0} → x₁ ≈C x₂ → xs₁ ≋ xs₂ → ys₁ ≋ ys₂ → ⊞-ne-r k x₁ x₁≠0 xs₁ ys₁ ≋ ⊞-ne-r k x₂ x₂≠0 xs₂ ys₂
-
-⊞-ne-cong : ∀ {i j}
-          → (c : ℕ.Ordering i j)
-          → ∀ {x₁ y₁ x₂ y₂ xs₁ ys₁ xs₂ ys₂}
-          → .{x₁≠0 : x₁ ≉0}
-          → .{x₂≠0 : x₂ ≉0}
-          → .{y₁≠0 : y₁ ≉0}
-          → .{y₂≠0 : y₂ ≉0}
-          → x₁ ≈C x₂
-          → xs₁ ≋ xs₂
-          → y₁ ≈C y₂
-          → ys₁ ≋ ys₂
-          → ⊞-ne c x₁ x₁≠0 xs₁ y₁ y₁≠0 ys₁ ≋ ⊞-ne c x₂ x₂≠0 xs₂ y₂ y₂≠0 ys₂
-⊞-ne-cong (ℕ.less m k) xp xps yp yps = xp ∷≋ ⊞-ne-l-cong xps yp yps
-⊞-ne-cong (ℕ.greater m k) xp xps yp yps = yp ∷≋ ⊞-ne-r-cong xp xps yps
-⊞-ne-cong (ℕ.equal i) {x₁} {y₁} {x₂} {y₂} xp xps yp yps = ∷↓-cong (+-cong-C xp yp) (⊞-cong xps yps)
-
-⊞-ne-l-cong []≋ yp yps = yp ∷≋ yps
-⊞-ne-l-cong {k} (_∷≋_ {i} xp xps) yp yps = ⊞-ne-cong (ℕ.compare i k) xp xps yp yps
-
-⊞-ne-r-cong xp xps []≋ = xp ∷≋ xps
-⊞-ne-r-cong {k} xp xps (_∷≋_ {j} yp yps) = ⊞-ne-cong (ℕ.compare k j) xp xps yp yps
-
 ⊞-cong []≋ yp = yp
 ⊞-cong (xp ∷≋ xps) []≋ = xp ∷≋ xps
 ⊞-cong (_∷≋_ {i} xp xps) (_∷≋_ {j} yp yps) = ⊞-ne-cong (ℕ.compare i j) xp xps yp yps
+  where
+  ⊞-ne-l-cong : ∀ {k xs₁ xs₂ y₁ y₂ ys₁ ys₂}
+              → .{y₁≠0 : y₁ ≉0}
+              → .{y₂≠0 : y₂ ≉0}
+              → xs₁ ≋ xs₂
+              → y₁ ≈C y₂
+              → ys₁ ≋ ys₂
+              → ⊞-ne-l k xs₁ y₁ y₁≠0 ys₁ ≋ ⊞-ne-l k xs₂ y₂ y₂≠0 ys₂
+  ⊞-ne-r-cong : ∀ {k x₁ xs₁ ys₁ x₂ xs₂ ys₂}
+              → .{x₁≠0 : x₁ ≉0}
+              → .{x₂≠0 : x₂ ≉0}
+              → x₁ ≈C x₂
+              → xs₁ ≋ xs₂
+              → ys₁ ≋ ys₂
+              → ⊞-ne-r k x₁ x₁≠0 xs₁ ys₁ ≋ ⊞-ne-r k x₂ x₂≠0 xs₂ ys₂
+  ⊞-ne-cong   : ∀ {i j}
+              → (c : ℕ.Ordering i j)
+              → ∀ {x₁ y₁ x₂ y₂ xs₁ ys₁ xs₂ ys₂}
+              → .{x₁≠0 : x₁ ≉0}
+              → .{x₂≠0 : x₂ ≉0}
+              → .{y₁≠0 : y₁ ≉0}
+              → .{y₂≠0 : y₂ ≉0}
+              → x₁ ≈C x₂
+              → xs₁ ≋ xs₂
+              → y₁ ≈C y₂
+              → ys₁ ≋ ys₂
+              → ⊞-ne c x₁ x₁≠0 xs₁ y₁ y₁≠0 ys₁ ≋ ⊞-ne c x₂ x₂≠0 xs₂ y₂ y₂≠0 ys₂
 
+  ⊞-ne-cong (ℕ.less m k) xp xps yp yps = xp ∷≋ ⊞-ne-l-cong xps yp yps
+  ⊞-ne-cong (ℕ.greater m k) xp xps yp yps = yp ∷≋ ⊞-ne-r-cong xp xps yps
+  ⊞-ne-cong (ℕ.equal i) {x₁} {y₁} {x₂} {y₂} xp xps yp yps = ∷↓-cong (+-cong-C xp yp) (⊞-cong xps yps)
+
+  ⊞-ne-l-cong []≋ yp yps = yp ∷≋ yps
+  ⊞-ne-l-cong {k} (_∷≋_ {i} xp xps) yp yps = ⊞-ne-cong (ℕ.compare i k) xp xps yp yps
+
+  ⊞-ne-r-cong xp xps []≋ = xp ∷≋ xps
+  ⊞-ne-r-cong {k} xp xps (_∷≋_ {j} yp yps) = ⊞-ne-cong (ℕ.compare k j) xp xps yp yps
+
+⋊-cong : ∀ {x₁ x₂ xs₁ xs₂} → x₁ ≈C x₂ → xs₁ ≋ xs₂ → x₁ ⋊ xs₁ ≋ x₂ ⋊ xs₂
+⋊-cong xp []≋ = []≋
+⋊-cong xp (yp ∷≋ xps) = ∷↓-cong (*-cong-C xp yp) (⋊-cong xp xps)
+
+⊠-cong : Congruent₂ _⊠_
+⊠-cong []≋ ys = []≋
+⊠-cong (x ∷≋ xs) []≋ = []≋
+⊠-cong (x ∷≋ xs) (y ∷≋ ys) = ∷↓-cong (*-cong-C x y) (⊞-cong (⋊-cong x ys) (⊠-cong xs (y ∷≋ ys)))
