@@ -99,11 +99,7 @@ open import Data.Empty
           → ⊞-ne c x₁ x₁≠0 xs₁ y₁ y₁≠0 ys₁ ≋ ⊞-ne c x₂ x₂≠0 xs₂ y₂ y₂≠0 ys₂
 ⊞-ne-cong (ℕ.less m k) xp xps yp yps = xp ∷≋ ⊞-ne-l-cong xps yp yps
 ⊞-ne-cong (ℕ.greater m k) xp xps yp yps = yp ∷≋ ⊞-ne-r-cong xp xps yps
-⊞-ne-cong (ℕ.equal i) {x₁} {y₁} {x₂} {y₂} xp xps yp yps with (x₁ + y₁) ≟C 0# | (x₂ + y₂) ≟C 0#
-... | yes p | yes p₁ = ⍓-cong (⊞-cong xps yps)
-... | yes p | no ¬p = ⊥-elim (¬p (trans-C (sym-C (+-cong-C xp yp)) p))
-... | no ¬p | yes p = ⊥-elim (¬p (trans-C (+-cong-C xp yp) p))
-... | no ¬p | no ¬p₁ = +-cong-C xp yp ∷≋ ⊞-cong xps yps
+⊞-ne-cong (ℕ.equal i) {x₁} {y₁} {x₂} {y₂} xp xps yp yps = ∷↓-cong (+-cong-C xp yp) (⊞-cong xps yps)
 
 ⊞-ne-l-cong []≋ yp yps = yp ∷≋ yps
 ⊞-ne-l-cong {k} (_∷≋_ {i} xp xps) yp yps = ⊞-ne-cong (ℕ.compare i k) xp xps yp yps
