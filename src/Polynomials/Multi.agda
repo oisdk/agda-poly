@@ -97,6 +97,22 @@ module Addition where
   -- helper function. Instead, you could conceivably use a with-block
   -- (on ℕ.compare p q):
   --
+  -- ⊞-coeffs ((x , p) ∷ xs) ((y , q) ∷ ys) with (ℕ.compare p q)
+  -- ... | ℕ.less    p k = (x , p) ∷ ⊞-coeffs xs ((y , k) ∷ ys)
+  -- ... | ℕ.equal   p   = (fst~ x ⊞ fst~ y , p) ∷↓ ⊞-coeffs xs ys
+  -- ... | ℕ.greater q k = (y , q) ∷ ⊞-coeffs ((x , k) ∷ xs) ys
+  --
+  -- However, because the first and third recursive calls each rewrap
+  -- a list that was already pattern-matched on, so the recursive call
+  -- does not strictly decrease the size of its argument.
+  --
+  -- Interestingly, if --without-K is turned off, we don't need the
+  -- helper function ⊞-coeffs; we could pattern match in _⊞_ directly.
+  --
+  -- _⊞_ {zero} (lift x) (lift y) = lift (x + y)
+  -- _⊞_ {suc n} [] ys = ys
+  -- _⊞_ {suc n} (x ∷ xs) [] = x ∷ xs
+  -- _⊞_ {suc n} ((x , p) ∷ xs) ((y , q) ∷ ys) = ⊞-ne (ℕ.compare p q) x xs y ys
 
   infixl 6 _⊞_
   _⊞_ : ∀ {n} → Poly n → Poly n → Poly n
