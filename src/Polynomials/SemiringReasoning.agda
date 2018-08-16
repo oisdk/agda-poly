@@ -15,11 +15,11 @@ module Polynomials.SemiringReasoning
   where
 
 import Relation.Binary.PropositionalEquality as ≡
-open import Relation.Binary.EqReasoning setoid public
 open Setoid setoid
 open import Relation.Nullary
+open import Relation.Binary.EqReasoning setoid public
 
--- Standard Equational reasoning combinators
+-- -- Standard Equational reasoning combinators
 
 -- infix  4 _IsRelatedTo_
 -- data _IsRelatedTo_ (x y : Carrier) : Set ℓ where
@@ -49,6 +49,10 @@ open import Relation.Nullary
 -- step-≡ _ (relTo y≈z) x≈y = relTo (≡.subst _ (≡.sym x≈y) y≈z)
 
 -- syntax step-≡ x y≈z x≈y = x ≡⟨ x≈y ⟩ y≈z
+
+-- infix 3 _∎
+-- _∎ : ∀ x → x IsRelatedTo x
+-- _∎ _ = relTo refl
 
 -- These are combinators for congruence, as custom setoids don't
 -- automatic congruence over function application. For each
