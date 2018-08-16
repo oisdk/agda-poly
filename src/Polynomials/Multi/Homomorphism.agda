@@ -26,6 +26,7 @@ open import Data.List as List using (_∷_; [])
 open import Data.Vec as Vec using (Vec; _∷_; [])
 open import Polynomials.Irrelevant.Product
 open import Level using (Lift; lower; lift)
+open import Data.Fin as Fin using (Fin)
 
 pow-add : ∀ x i j → x ^ i * x ^ j ≈ x ^ (i ℕ.+ j)
 pow-add x zero j = *-identityˡ (x ^ j)
@@ -272,3 +273,48 @@ mutual
     ≡⟨⟩
       ⟦ (x , i) ∷ xs ⟧ (ρ ∷ Ρ) * ⟦ (y , j) ∷ ys ⟧ (ρ ∷ Ρ)
     ∎
+
+κ-hom : ∀ {n}
+      → (x : Carrier)
+      → (Ρ : Vec Carrier n)
+      → ⟦ κ x ⟧ Ρ ≈ x
+κ-hom x [] = refl
+κ-hom x (ρ ∷ Ρ) =
+  begin
+    ⟦ κ x ⟧ (ρ ∷ Ρ)
+  ≈⟨ ∷↓-hom _ _ _ ρ Ρ ⟩
+    (⟦ κ x ⟧ Ρ + 0# * ρ) * ρ ^ 0
+  ≈⟨ *-identityʳ _ ⟩
+    ⟦ κ x ⟧ Ρ + 0# * ρ
+  ≈⟨ +≫ zeroˡ ρ ⟩
+    ⟦ κ x ⟧ Ρ + 0#
+  ≈⟨ +-identityʳ _ ⟩
+    ⟦ κ x ⟧ Ρ
+  ≈⟨ κ-hom x Ρ ⟩
+    x
+  ∎
+
+ι-hom : ∀ {n} → (x : Fin n) → (Ρ : Vec Carrier n) → ⟦ ι x ⟧ Ρ ≈ Vec.lookup x Ρ
+ι-hom Fin.zero (ρ ∷ Ρ) =
+  begin
+    ⟦ (κ 1# , 1) ∷↓ [] ⟧ (ρ ∷ Ρ)
+  ≈⟨ ∷↓-hom _ _ _ ρ Ρ ⟩
+    (⟦ κ 1# ⟧ Ρ + 0# * ρ) * ρ ^ 1
+  ≈⟨ ((κ-hom 1# Ρ ⟨ +-cong ⟩ zeroˡ ρ) ︔ +-identityʳ 1#) ⟨ *-cong ⟩ *-identityʳ ρ ⟩
+    1# * ρ
+  ≈⟨ *-identityˡ ρ ⟩
+    ρ
+  ∎
+ι-hom (Fin.suc x) (ρ ∷ Ρ) =
+  begin
+    ⟦ (ι x , 0) ∷↓ [] ⟧ (ρ ∷ Ρ)
+  ≈⟨ ∷↓-hom _ _ _ ρ Ρ ⟩
+    (⟦ ι x ⟧ Ρ + 0# * ρ) * ρ ^ 0
+  ≈⟨ *-identityʳ _ ⟩
+    ⟦ ι x ⟧ Ρ + 0# * ρ
+  ≈⟨ ι-hom x Ρ ⟨ +-cong ⟩ zeroˡ ρ ⟩
+    Vec.lookup x Ρ + 0#
+  ≈⟨ +-identityʳ _ ⟩
+    Vec.lookup x Ρ
+  ∎
+
