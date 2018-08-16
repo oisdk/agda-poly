@@ -103,26 +103,24 @@ mutual
         y′ = ⟦ fst~ y ⟧ Ρ
     in
     begin
-      ⟦ (x ⊕ y , i) ∷↓ xs ⊞ ys ⟧ (ρ ∷ Ρ)
-    ≈⟨ (∷↓-hom (x ⊕ y) i (xs ⊞ ys) ρ Ρ) ⟩
-      (⟦ x ⊕ y ⟧ Ρ + ⟦ xs ⊞ ys ⟧ (ρ ∷ Ρ) * ρ) * ρ ^ i
+      ⟦ (fst~ x ⊞ fst~ y , i) ∷↓ xs ⊞ ys ⟧ (ρ ∷ Ρ)
+    ≈⟨ (∷↓-hom _ i (xs ⊞ ys) ρ Ρ) ⟩
+      (⟦ fst~ x ⊞ fst~ y ⟧ Ρ + ⟦ xs ⊞ ys ⟧ (ρ ∷ Ρ) * ρ) * ρ ^ i
     ≈⟨ ≪* begin
-            ⟦ x ⊕ y ⟧ Ρ + ⟦ xs ⊞ ys ⟧ (ρ ∷ Ρ) * ρ
-          ≈⟨ +≫ ≪* ⊞-coeffs-hom xs ys (ρ ∷ Ρ) ⟩
-            ⟦ x ⊕ y ⟧ Ρ + (⟦ xs ⟧ (ρ ∷ Ρ) + ⟦ ys ⟧ (ρ ∷ Ρ)) * ρ
+            ⟦ fst~ x ⊞ fst~ y ⟧ Ρ + ⟦ xs ⊞ ys ⟧ (ρ ∷ Ρ) * ρ
+          ≈⟨ ⊞-hom (fst~ x) (fst~ y) Ρ ⟨ +-cong ⟩ (≪* ⊞-coeffs-hom xs ys (ρ ∷ Ρ)) ⟩
+            (x′ + y′) + (⟦ xs ⟧ (ρ ∷ Ρ) + ⟦ ys ⟧ (ρ ∷ Ρ)) * ρ
           ≈⟨ +≫ distribʳ ρ _ _ ⟩
-            ⟦ x ⊕ y ⟧ Ρ + (⟦ xs ⟧ (ρ ∷ Ρ) * ρ + ⟦ ys ⟧ (ρ ∷ Ρ) * ρ)
-          ≈⟨ ≪+ ⊞-hom (fst~ x) (fst~ y) Ρ ⟩
             (x′ + y′) + (⟦ xs ⟧ (ρ ∷ Ρ) * ρ + ⟦ ys ⟧ (ρ ∷ Ρ) * ρ)
-          ≈⟨ +-assoc (x′) (y′) _ ⟩
+          ≈⟨ +-assoc x′ y′ _ ⟩
             x′ + (y′ + (⟦ xs ⟧ (ρ ∷ Ρ) * ρ + ⟦ ys ⟧ (ρ ∷ Ρ) * ρ))
           ≈⟨ +≫ sym ( +-assoc y′ _ _ ) ⟩
             x′ + ((y′ + ⟦ xs ⟧ (ρ ∷ Ρ) * ρ) + ⟦ ys ⟧ (ρ ∷ Ρ) * ρ)
           ≈⟨ +≫ ≪+ +-comm y′ _ ⟩
             x′ + ((⟦ xs ⟧ (ρ ∷ Ρ) * ρ + y′) + ⟦ ys ⟧ (ρ ∷ Ρ) * ρ)
-          ≈⟨ +≫ +-assoc _ (y′) _ ⟩
+          ≈⟨ +≫ +-assoc _ y′ _ ⟩
             x′ + (⟦ xs ⟧ (ρ ∷ Ρ) * ρ + (y′ + ⟦ ys ⟧ (ρ ∷ Ρ) * ρ))
-          ≈⟨ sym (+-assoc (x′) _ _) ⟩
+          ≈⟨ sym (+-assoc x′ _ _) ⟩
             (x′ + ⟦ xs ⟧ (ρ ∷ Ρ) * ρ) + (⟦ fst~ y ⟧ Ρ + ⟦ ys ⟧ (ρ ∷ Ρ) * ρ)
           ∎
     ⟩
