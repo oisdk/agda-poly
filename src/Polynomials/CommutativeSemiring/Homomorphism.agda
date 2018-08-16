@@ -83,16 +83,17 @@ mutual
         → (Ρ : Vec Carrier n)
         → ⟦ xs ⊞ ys ⟧ Ρ ≈ ⟦ xs ⟧ Ρ + ⟦ ys ⟧ Ρ
   ⊞-hom {ℕ.zero} xs ys [] = refl
-  ⊞-hom {suc n} xs ys Ρ = ⊞-coeffs-hom xs ys Ρ
+  ⊞-hom {suc n} xs ys (ρ ∷ Ρ) = ⊞-coeffs-hom xs ys ρ Ρ
 
   ⊞-coeffs-hom : ∀ {n}
               → (xs : Coeffs n)
               → (ys : Coeffs n)
-              → (Ρ : Vec Carrier (suc n))
-              → ⟦ ⊞-coeffs xs ys ⟧ Ρ ≈ ⟦ xs ⟧ Ρ + ⟦ ys ⟧ Ρ
-  ⊞-coeffs-hom [] ys (ρ ∷ Ρ) = sym (+-identityˡ (⟦ ys ⟧ (ρ ∷ Ρ)))
-  ⊞-coeffs-hom (x ∷ xs) [] (ρ ∷ Ρ) = sym (+-identityʳ (⟦ x ∷ xs ⟧ (ρ ∷ Ρ)))
-  ⊞-coeffs-hom ((x , i) ∷ xs) ((y , j) ∷ ys) Ρ = ⊞-ne-hom (ℕ.compare i j) x xs y ys Ρ
+              → (ρ : Carrier)
+              → (Ρ : Vec Carrier n)
+              → ⟦ ⊞-coeffs xs ys ⟧ (ρ ∷ Ρ) ≈ ⟦ xs ⟧ (ρ ∷ Ρ) + ⟦ ys ⟧ (ρ ∷ Ρ)
+  ⊞-coeffs-hom [] ys ρ Ρ = sym (+-identityˡ (⟦ ys ⟧ (ρ ∷ Ρ)))
+  ⊞-coeffs-hom (x ∷ xs) [] ρ Ρ = sym (+-identityʳ (⟦ x ∷ xs ⟧ (ρ ∷ Ρ)))
+  ⊞-coeffs-hom ((x , i) ∷ xs) ((y , j) ∷ ys) ρ Ρ = ⊞-ne-hom (ℕ.compare i j) x xs y ys ρ Ρ
 
   ⊞-ne-hom : ∀ {n i j}
           → (c : ℕ.Ordering i j)
@@ -100,9 +101,10 @@ mutual
           → (xs : Coeffs n)
           → (y : Coeff n)
           → (ys : Coeffs n)
-          → (Ρ : Vec Carrier (suc n))
-          → ⟦ ⊞-ne c x xs y ys ⟧ Ρ ≈ ⟦ (x , i) ∷ xs ⟧ Ρ + ⟦ (y , j) ∷ ys ⟧ Ρ
-  ⊞-ne-hom (ℕ.equal i) x xs y ys (ρ ∷ Ρ) =
+          → (ρ : Carrier)
+          → (Ρ : Vec Carrier n)
+          → ⟦ ⊞-ne c x xs y ys ⟧ (ρ ∷ Ρ) ≈ ⟦ (x , i) ∷ xs ⟧ (ρ ∷ Ρ) + ⟦ (y , j) ∷ ys ⟧ (ρ ∷ Ρ)
+  ⊞-ne-hom (ℕ.equal i) x xs y ys ρ Ρ =
     let x′ = ⟦ fst~ x ⟧ Ρ
         y′ = ⟦ fst~ y ⟧ Ρ
     in
@@ -112,7 +114,7 @@ mutual
       (⟦ fst~ x ⊞ fst~ y ⟧ Ρ + ⟦ xs ⊞ ys ⟧ (ρ ∷ Ρ) * ρ) * ρ ^ i
     ≈⟨ ≪* begin
             ⟦ fst~ x ⊞ fst~ y ⟧ Ρ + ⟦ xs ⊞ ys ⟧ (ρ ∷ Ρ) * ρ
-          ≈⟨ ⊞-hom (fst~ x) (fst~ y) Ρ ⟨ +-cong ⟩ (≪* ⊞-coeffs-hom xs ys (ρ ∷ Ρ)) ⟩
+          ≈⟨ ⊞-hom (fst~ x) (fst~ y) Ρ ⟨ +-cong ⟩ (≪* ⊞-coeffs-hom xs ys ρ Ρ) ⟩
             (x′ + y′) + (⟦ xs ⟧ (ρ ∷ Ρ) + ⟦ ys ⟧ (ρ ∷ Ρ)) * ρ
           ≈⟨ +≫ distribʳ ρ _ _ ⟩
             (x′ + y′) + (⟦ xs ⟧ (ρ ∷ Ρ) * ρ + ⟦ ys ⟧ (ρ ∷ Ρ) * ρ)
@@ -132,12 +134,12 @@ mutual
     ≈⟨ distribʳ (ρ ^ i) _ _ ⟩
       (x′ + ⟦ xs ⟧ (ρ ∷ Ρ) * ρ) * ρ ^ i + (y′ + ⟦ ys ⟧ (ρ ∷ Ρ) * ρ) * ρ ^ i
     ∎
-  ⊞-ne-hom (ℕ.less i k) x xs y ys (ρ ∷ Ρ) =
+  ⊞-ne-hom (ℕ.less i k) x xs y ys ρ Ρ =
     let x′ = ⟦ fst~ x ⟧ Ρ
     in
     begin
       (x′ + ⟦ ⊞-ne-l k xs y ys ⟧ (ρ ∷ Ρ) * ρ) * ρ ^ i
-    ≈⟨ ≪* +≫ ≪* ⊞-ne-l-hom k xs y ys (ρ ∷ Ρ) ⟩
+    ≈⟨ ≪* +≫ ≪* ⊞-ne-l-hom k xs y ys ρ Ρ ⟩
       (x′ + (⟦ xs ⟧ (ρ ∷ Ρ) + ⟦ (y , k) ∷ ys ⟧ (ρ ∷ Ρ)) * ρ) * ρ ^ i
     ≈⟨ ≪* +≫ distribʳ ρ _ _ ⟩
       (x′ + (⟦ xs ⟧ (ρ ∷ Ρ) * ρ + ⟦ (y , k) ∷ ys ⟧ (ρ ∷ Ρ) * ρ)) * ρ ^ i
@@ -150,12 +152,12 @@ mutual
     ≡⟨ ≡.cong (λ ik → ⟦ (x , i) ∷ xs ⟧ (ρ ∷ Ρ) + ⟦ (y , ik) ∷ ys ⟧ (ρ ∷ Ρ)) (ℕ-≡.+-comm k (suc i)) ⟩
       ⟦ (x , i) ∷ xs ⟧ (ρ ∷ Ρ) + ⟦ (y , suc (i ℕ.+ k)) ∷ ys ⟧ (ρ ∷ Ρ)
     ∎
-  ⊞-ne-hom (ℕ.greater j k) x xs y ys (ρ ∷ Ρ) =
+  ⊞-ne-hom (ℕ.greater j k) x xs y ys ρ Ρ =
     let y′ = ⟦ fst~ y ⟧ Ρ
     in
     begin
       (y′ + ⟦ ⊞-ne-r k x xs ys ⟧ (ρ ∷ Ρ) * ρ) * ρ ^ j
-    ≈⟨ ≪* +≫ ≪* (⊞-ne-r-hom k x xs ys (ρ ∷ Ρ) ︔ +-comm _ _) ⟩
+    ≈⟨ ≪* +≫ ≪* (⊞-ne-r-hom k x xs ys ρ Ρ ︔ +-comm _ _) ⟩
       (y′ + (⟦ ys ⟧ (ρ ∷ Ρ) + ⟦ (x , k) ∷ xs ⟧ (ρ ∷ Ρ)) * ρ) * ρ ^ j
     ≈⟨ ≪* +≫ distribʳ ρ _ _ ⟩
       (y′ + (⟦ ys ⟧ (ρ ∷ Ρ) * ρ + ⟦ (x , k) ∷ xs ⟧ (ρ ∷ Ρ) * ρ)) * ρ ^ j
@@ -177,19 +179,21 @@ mutual
             → (xs : Coeffs n)
             → (y : Coeff n)
             → (ys : Coeffs n)
-            → (Ρ : Vec Carrier (suc n))
-            → ⟦ ⊞-ne-l k xs y ys ⟧ Ρ ≈ ⟦ xs ⟧ Ρ + ⟦ (y , k) ∷ ys ⟧ Ρ
-  ⊞-ne-l-hom k [] y ys (ρ ∷ Ρ) = sym (+-identityˡ _)
-  ⊞-ne-l-hom k ((x , i) ∷ xs) y ys (ρ ∷ Ρ) = ⊞-ne-hom (ℕ.compare i k) x xs y ys (ρ ∷ Ρ)
+            → (ρ : Carrier)
+            → (Ρ : Vec Carrier n)
+            → ⟦ ⊞-ne-l k xs y ys ⟧ (ρ ∷ Ρ) ≈ ⟦ xs ⟧ (ρ ∷ Ρ) + ⟦ (y , k) ∷ ys ⟧ (ρ ∷ Ρ)
+  ⊞-ne-l-hom k [] y ys ρ Ρ = sym (+-identityˡ _)
+  ⊞-ne-l-hom k ((x , i) ∷ xs) y ys ρ Ρ = ⊞-ne-hom (ℕ.compare i k) x xs y ys ρ Ρ
 
   ⊞-ne-r-hom : ∀ {n} k
             → (x : Coeff n)
             → (xs : Coeffs n)
             → (ys : Coeffs n)
-            → (Ρ : Vec Carrier (suc n))
-            → ⟦ ⊞-ne-r k x xs ys ⟧ Ρ ≈ ⟦ (x , k) ∷ xs ⟧ Ρ + ⟦ ys ⟧ Ρ
-  ⊞-ne-r-hom k x xs [] (ρ ∷ Ρ) = sym (+-identityʳ _)
-  ⊞-ne-r-hom k x xs ((y , j) ∷ ys) (ρ ∷ Ρ) = ⊞-ne-hom (ℕ.compare k j) x xs y ys (ρ ∷ Ρ)
+            → (ρ : Carrier)
+            → (Ρ : Vec Carrier n)
+            → ⟦ ⊞-ne-r k x xs ys ⟧ (ρ ∷ Ρ) ≈ ⟦ (x , k) ∷ xs ⟧ (ρ ∷ Ρ) + ⟦ ys ⟧ (ρ ∷ Ρ)
+  ⊞-ne-r-hom k x xs [] ρ Ρ = sym (+-identityʳ _)
+  ⊞-ne-r-hom k x xs ((y , j) ∷ ys) ρ Ρ = ⊞-ne-hom (ℕ.compare k j) x xs y ys ρ Ρ
 
 mutual
   ⋊-hom : ∀ {n}
