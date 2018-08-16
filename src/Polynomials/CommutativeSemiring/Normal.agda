@@ -1,13 +1,12 @@
 {-# OPTIONS --without-K #-}
 
-open import Algebra using (CommutativeSemiring)
+open import Algebra
 open import Relation.Binary
-open import Relation.Nullary.Decidable
 open import Relation.Nullary
 open import Level using (_⊔_; Lift; lift; lower)
 open import Data.Empty
 open import Data.Unit using (⊤; tt)
-open import Data.List as List using (_∷_; []; foldr; List)
+open import Data.List as List using (_∷_; []; List)
 open import Data.Vec as Vec using (_∷_; []; Vec)
 open import Data.Nat as ℕ using (ℕ; suc; zero)
 open import Data.Product
@@ -122,7 +121,8 @@ mutual
   -- _⊞_ {zero} (lift x) (lift y) = lift (x + y)
   -- _⊞_ {suc n} [] ys = ys
   -- _⊞_ {suc n} (x ∷ xs) [] = x ∷ xs
-  -- _⊞_ {suc n} ((x , p) ∷ xs) ((y , q) ∷ ys) = ⊞-ne (ℕ.compare p q) x xs y ys
+  -- _⊞_ {suc n} ((x , p) ∷ xs) ((y , q) ∷ ys) =
+  --   ⊞-ne (ℕ.compare p q) x xs y ys
 
   infixl 6 _⊞_
   _⊞_ : ∀ {n} → Poly n → Poly n → Poly n
@@ -132,7 +132,8 @@ mutual
   ⊞-coeffs : ∀ {n} → Coeffs n → Coeffs n → Coeffs n
   ⊞-coeffs [] ys = ys
   ⊞-coeffs (x ∷ xs) [] = x ∷ xs
-  ⊞-coeffs ((x , p) ∷ xs) ((y , q) ∷ ys) = ⊞-ne (ℕ.compare p q) x xs y ys
+  ⊞-coeffs ((x , p) ∷ xs) ((y , q) ∷ ys) =
+    ⊞-ne (ℕ.compare p q) x xs y ys
 
   ⊞-ne : ∀ {p q n}
       → ℕ.Ordering p q
