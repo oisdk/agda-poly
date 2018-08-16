@@ -88,6 +88,12 @@ _∷↓_ : ∀ {n} → (Poly n × ℕ) → Coeffs n → Coeffs n
 ... | yes p = xs ⍓ suc i
 ... | no ¬p = (x ,~ ¬p , i) ∷ xs
 
+map-poly : ∀ {n} → (Poly n → Poly n) → Coeffs n → Coeffs n
+map-poly {n} f = List.foldr cons []
+  where
+  cons : (Coeff n × ℕ) → Coeffs n → Coeffs n
+  cons ((x ,~ _) , i) = _∷↓_ (f x , i)
+
 ----------------------------------------------------------------------
 -- Arithmetic
 ----------------------------------------------------------------------
@@ -107,11 +113,11 @@ mutual
   -- ... | ℕ.greater q k = (y , q) ∷ ⊞-coeffs ((x , k) ∷ xs) ys
   --
   -- However, because the first and third recursive calls each rewrap
-  -- a list that was already pattern-matched on, so the recursive call
+  -- a list that was already pattern-matched on, the recursive call
   -- does not strictly decrease the size of its argument.
   --
   -- Interestingly, if --without-K is turned off, we don't need the
-  -- helper function ⊞-coeffs; we could pattern match in _⊞_ directly.
+  -- helper function ⊞-coeffs; we could pattern match on _⊞_ directly.
   --
   -- _⊞_ {zero} (lift x) (lift y) = lift (x + y)
   -- _⊞_ {suc n} [] ys = ys
@@ -121,7 +127,7 @@ mutual
   infixl 6 _⊞_
   _⊞_ : ∀ {n} → Poly n → Poly n → Poly n
   _⊞_ {zero} (lift x) (lift y) = lift (x + y)
-  _⊞_ {suc n} xs ys = ⊞-coeffs xs ys
+  _⊞_ {suc n} = ⊞-coeffs
 
   ⊞-coeffs : ∀ {n} → Coeffs n → Coeffs n → Coeffs n
   ⊞-coeffs [] ys = ys
@@ -137,7 +143,8 @@ mutual
       → Coeffs n
   ⊞-ne (ℕ.less    i k) x xs y ys = (x , i) ∷ ⊞-ne-l k xs y ys
   ⊞-ne (ℕ.greater j k) x xs y ys = (y , j) ∷ ⊞-ne-r k x xs ys
-  ⊞-ne (ℕ.equal   i  ) x xs y ys = (fst~ x ⊞ fst~ y , i) ∷↓ (⊞-coeffs xs ys)
+  ⊞-ne (ℕ.equal   i  ) x xs y ys =
+    (fst~ x ⊞ fst~ y , i) ∷↓ (⊞-coeffs xs ys)
 
   ⊞-ne-l : ∀ {n} → ℕ → Coeffs n → (y : Coeff n) → Coeffs n → Coeffs n
   ⊞-ne-l k [] y ys = (y , k) ∷ ys
@@ -154,20 +161,19 @@ mutual
   -- Multiply a polynomial in degree n by a Polynomial in degree n-1.
   infixl 7 _⋊_
   _⋊_ : ∀ {n} → Poly n → Poly (suc n) → Poly (suc n)
-  x ⋊ ((y , j) ∷ ys) = (x ⊠ fst~ y , j) ∷↓ x ⋊ ys
-  x ⋊ [] = []
+  _⋊_ = map-poly ∘ _⊠_
 
   infixl 7 _⊠_
   _⊠_ : ∀ {n} → Poly n → Poly n → Poly n
   _⊠_ {zero} (lift x) (lift y) = lift (x * y)
-  _⊠_ {suc n} xs ys = ⊠-coeffs xs ys
+  _⊠_ {suc n} = ⊠-coeffs
 
   -- A simple shift-and-add algorithm.
   ⊠-coeffs : ∀ {n} → Coeffs n → Coeffs n → Coeffs n
   ⊠-coeffs [] ys = []
   ⊠-coeffs (x ∷ xs) [] = []
   ⊠-coeffs ((x , i) ∷ xs) ((y , j) ∷ ys) =
-    (fst~ x ⊠ fst~ y , i ℕ.+ j) ∷↓ (fst~ x ⋊ ys ⊞ ⊠-coeffs xs ((y , 0) ∷ ys))
+    (fst~ x ⊠ fst~ y , j ℕ.+ i) ∷↓ (fst~ x ⋊ ys ⊞ ⊠-coeffs xs ((y , 0) ∷ ys))
 
 ----------------------------------------------------------------------
 -- Semantics

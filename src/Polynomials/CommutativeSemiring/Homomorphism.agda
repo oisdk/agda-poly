@@ -43,7 +43,11 @@ pow-add x (suc i) j =
     x ^ suc (i ℕ.+ j)
   ∎
 
-pow-hom : ∀ {n} i → (xs : Poly (suc n)) → ∀ ρ → (Ρ : Vec Carrier n) → ⟦ xs ⟧ (ρ ∷ Ρ) * ρ ^ i ≈ ⟦ xs ⍓ i ⟧ (ρ ∷ Ρ)
+pow-hom : ∀ {n} i
+        → (xs : Coeffs n)
+        → (ρ : Carrier)
+        → (Ρ : Vec Carrier n)
+        → ⟦ xs ⟧ (ρ ∷ Ρ) * ρ ^ i ≈ ⟦ xs ⍓ i ⟧ (ρ ∷ Ρ)
 pow-hom i [] ρ Ρ = zeroˡ (ρ ^ i)
 pow-hom i ((x , j) ∷ xs) ρ Ρ = *-assoc _ (ρ ^ j) (ρ ^ i) ︔ *≫ pow-add ρ j i
 
@@ -237,20 +241,18 @@ mutual
     begin
       ⟦ ⊠-coeffs ((x , i) ∷ xs) ((y , j) ∷ ys) ⟧ (ρ ∷ Ρ)
     ≡⟨⟩
-      ⟦ (fst~ x ⊠ fst~ y , i ℕ.+ j) ∷↓ fst~ x ⋊ ys ⊞ xs ⊠ ((y , 0) ∷ ys) ⟧ (ρ ∷ Ρ)
+      ⟦ (fst~ x ⊠ fst~ y , j ℕ.+ i) ∷↓ fst~ x ⋊ ys ⊞ xs ⊠ ((y , 0) ∷ ys) ⟧ (ρ ∷ Ρ)
     ≈⟨ ∷↓-hom _ _ _ ρ Ρ ⟩
-      (⟦ fst~ x ⊠ fst~ y ⟧ Ρ + ⟦ fst~ x ⋊ ys ⊞ xs ⊠ ((y , 0) ∷ ys) ⟧ (ρ ∷ Ρ) * ρ) * ρ ^ (i ℕ.+ j)
+      (⟦ fst~ x ⊠ fst~ y ⟧ Ρ + ⟦ fst~ x ⋊ ys ⊞ xs ⊠ ((y , 0) ∷ ys) ⟧ (ρ ∷ Ρ) * ρ) * ρ ^ (j ℕ.+ i)
     ≈⟨ ≪* ≪+ ⊠-hom (fst~ x) (fst~ y) Ρ ⟩
-      (x′ * y′ + ⟦ fst~ x ⋊ ys ⊞ xs ⊠ ((y , 0) ∷ ys) ⟧ (ρ ∷ Ρ) * ρ) * ρ ^ (i ℕ.+ j)
+      (x′ * y′ + ⟦ fst~ x ⋊ ys ⊞ xs ⊠ ((y , 0) ∷ ys) ⟧ (ρ ∷ Ρ) * ρ) * ρ ^ (j ℕ.+ i)
     ≈⟨ ≪* +≫ ≪* (⊞-hom (fst~ x ⋊ ys) _ (ρ ∷ Ρ)  ︔ (⋊-hom (fst~ x) ys ρ Ρ ⟨ +-cong ⟩ ⊠-coeffs-hom xs _ ρ Ρ)) ⟩
-      (x′ * y′ + (x′ * ⟦ ys ⟧ (ρ ∷ Ρ) + ⟦ xs ⟧ (ρ ∷ Ρ) * ⟦ (y , 0) ∷ ys ⟧ (ρ ∷ Ρ)) * ρ) * ρ ^ (i ℕ.+ j)
+      (x′ * y′ + (x′ * ⟦ ys ⟧ (ρ ∷ Ρ) + ⟦ xs ⟧ (ρ ∷ Ρ) * ⟦ (y , 0) ∷ ys ⟧ (ρ ∷ Ρ)) * ρ) * ρ ^ (j ℕ.+ i)
     ≈⟨ ≪* +≫ distribʳ ρ _ _ ⟩
-      (x′ * y′ + (x′ * ⟦ ys ⟧ (ρ ∷ Ρ) * ρ + ⟦ xs ⟧ (ρ ∷ Ρ) * ⟦ (y , 0) ∷ ys ⟧ (ρ ∷ Ρ) * ρ)) * ρ ^ (i ℕ.+ j)
+      (x′ * y′ + (x′ * ⟦ ys ⟧ (ρ ∷ Ρ) * ρ + ⟦ xs ⟧ (ρ ∷ Ρ) * ⟦ (y , 0) ∷ ys ⟧ (ρ ∷ Ρ) * ρ)) * ρ ^ (j ℕ.+ i)
     ≈⟨ ≪* sym (+-assoc (x′ * y′) _ _) ⟩
-      (x′ * y′ + x′ * ⟦ ys ⟧ (ρ ∷ Ρ) * ρ + ⟦ xs ⟧ (ρ ∷ Ρ) * ⟦ (y , 0) ∷ ys ⟧ (ρ ∷ Ρ) * ρ) * ρ ^ (i ℕ.+ j)
+      (x′ * y′ + x′ * ⟦ ys ⟧ (ρ ∷ Ρ) * ρ + ⟦ xs ⟧ (ρ ∷ Ρ) * ⟦ (y , 0) ∷ ys ⟧ (ρ ∷ Ρ) * ρ) * ρ ^ (j ℕ.+ i)
     ≈⟨ ≪* ≪+ (+≫ *-assoc x′ _ ρ ︔ sym (distribˡ x′ _ _)) ⟩
-      (x′ * (y′ + ⟦ ys ⟧ (ρ ∷ Ρ) * ρ) + ⟦ xs ⟧ (ρ ∷ Ρ) * ⟦ (y , 0) ∷ ys ⟧ (ρ ∷ Ρ) * ρ) * ρ ^ (i ℕ.+ j)
-    ≡⟨ ≡.cong (λ ij → (x′ * (y′ + ⟦ ys ⟧ (ρ ∷ Ρ) * ρ) + ⟦ xs ⟧ (ρ ∷ Ρ) * ⟦ (y , 0) ∷ ys ⟧ (ρ ∷ Ρ) * ρ) * ρ ^ ij) (ℕ-≡.+-comm i j) ⟩
       (x′ * (y′ + ⟦ ys ⟧ (ρ ∷ Ρ) * ρ) + ⟦ xs ⟧ (ρ ∷ Ρ) * ⟦ (y , 0) ∷ ys ⟧ (ρ ∷ Ρ) * ρ) * ρ ^ (j ℕ.+ i)
     ≈⟨ *≫ sym (pow-add ρ j i) ⟩
       (x′ * (y′ + ⟦ ys ⟧ (ρ ∷ Ρ) * ρ) + ⟦ xs ⟧ (ρ ∷ Ρ) * ⟦ (y , 0) ∷ ys ⟧ (ρ ∷ Ρ) * ρ) * (ρ ^ j * ρ ^ i)
