@@ -126,7 +126,24 @@ mutual
     ≈⟨ distribʳ (ρ ^ i) _ _ ⟩
       (⟦ fst~ x ⟧ Ρ + ⟦ xs ⟧ (ρ ∷ Ρ) * ρ) * ρ ^ i + (⟦ fst~ y ⟧ Ρ + ⟦ ys ⟧ (ρ ∷ Ρ) * ρ) * ρ ^ i
     ∎
-  ⊞-ne-hom (ℕ.less m k) x xs y ys (ρ ∷ Ρ) = {!!}
+  ⊞-ne-hom (ℕ.less i k) x xs y ys (ρ ∷ Ρ) =
+    let x′ = ⟦ fst~ x ⟧ Ρ
+    in
+    begin
+      (x′ + ⟦ ⊞-ne-l k xs y ys ⟧ (ρ ∷ Ρ) * ρ) * ρ ^ i
+    ≈⟨ ≪* +≫ ≪* ⊞-ne-l-hom k xs y ys (ρ ∷ Ρ) ⟩
+      (x′ + (⟦ xs ⟧ (ρ ∷ Ρ) + ⟦ (y , k) ∷ ys ⟧ (ρ ∷ Ρ)) * ρ) * ρ ^ i
+    ≈⟨ ≪* +≫ distribʳ ρ _ _ ⟩
+      (x′ + (⟦ xs ⟧ (ρ ∷ Ρ) * ρ + ⟦ (y , k) ∷ ys ⟧ (ρ ∷ Ρ) * ρ)) * ρ ^ i
+    ≈⟨ ≪* sym (+-assoc x′ _ _) ⟩
+      (x′ + ⟦ xs ⟧ (ρ ∷ Ρ) * ρ + ⟦ (y , k) ∷ ys ⟧ (ρ ∷ Ρ) * ρ) * ρ ^ i
+    ≈⟨ distribʳ (ρ ^ i) _ _ ⟩
+      ⟦ (x , i)  ∷ xs ⟧ (ρ ∷ Ρ) + ⟦ (y , k) ∷ ys ⟧ (ρ ∷ Ρ) * ρ * ρ ^ i
+    ≈⟨ +≫ (*-assoc _ ρ (ρ ^ i) ︔ *-assoc _ (ρ ^ k) (ρ ^ suc i) ︔ *≫ pow-add _ k (suc i))⟩
+      ⟦ (x , i) ∷ xs ⟧ (ρ ∷ Ρ) + ⟦ (y  , k ℕ.+ suc i) ∷ ys ⟧ (ρ ∷ Ρ)
+    ≡⟨ ≡.cong (λ ik → ⟦ (x , i) ∷ xs ⟧ (ρ ∷ Ρ) + ⟦ (y , ik) ∷ ys ⟧ (ρ ∷ Ρ)) (ℕ-≡.+-comm k (suc i)) ⟩
+      ⟦ (x , i) ∷ xs ⟧ (ρ ∷ Ρ) + ⟦ (y , suc (i ℕ.+ k)) ∷ ys ⟧ (ρ ∷ Ρ)
+    ∎
   ⊞-ne-hom (ℕ.greater m k) x xs y ys (ρ ∷ Ρ) = {!!}
 
   ⊞-ne-l-hom : ∀ {n} k
