@@ -79,7 +79,3 @@ _︔_ = trans
 infixr 2 _≅⟨_⟩_
 _≅⟨_⟩_ : ∀ w {x y z} → (y ≈ z → w ≈ x) → y IsRelatedTo z → w IsRelatedTo x
 _ ≅⟨ congruence ⟩ relTo y~z = relTo (congruence y~z)
-
-infix 4 _≉_
-_≉_ : Carrier → Carrier → Set ℓ
-x ≉ y = ¬ (x ≈ y)
