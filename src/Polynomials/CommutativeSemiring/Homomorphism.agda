@@ -6,15 +6,15 @@ open import Relation.Binary
 ----------------------------------------------------------------------
 -- Homomorphism
 ----------------------------------------------------------------------
-module Polynomials.Multi.Homomorphism
+module Polynomials.CommutativeSemiring.Homomorphism
   {a ℓ}
   (commutativeSemiring : CommutativeSemiring a ℓ)
   (_≟C_ : Decidable (CommutativeSemiring._≈_ commutativeSemiring))
   where
 
 open CommutativeSemiring commutativeSemiring
-open import Polynomials.SemiringReasoning setoid _+_ _*_ +-cong *-cong
-open import Polynomials.Multi commutativeSemiring _≟C_
+open import Polynomials.CommutativeSemiring.Reasoning commutativeSemiring
+open import Polynomials.CommutativeSemiring.Normal commutativeSemiring _≟C_
 
 open import Relation.Nullary
 open import Data.Nat as ℕ using (ℕ; suc; zero)

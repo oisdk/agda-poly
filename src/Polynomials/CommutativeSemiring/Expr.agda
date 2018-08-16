@@ -3,7 +3,7 @@
 open import Algebra using (CommutativeSemiring)
 open import Relation.Binary
 
-module Polynomials.Multi.Expr
+module Polynomials.CommutativeSemiring.Expr
   {a ℓ}
   (commutativeSemiring : CommutativeSemiring a ℓ)
   (_≟C_ : Decidable (CommutativeSemiring._≈_ commutativeSemiring))
@@ -28,7 +28,7 @@ data Expr : ℕ → Set a where
 ⟦ x ⊕ y ⟧ ρ = ⟦ x ⟧ ρ + ⟦ y ⟧ ρ
 ⟦ x ⊗ y ⟧ ρ = ⟦ x ⟧ ρ * ⟦ y ⟧ ρ
 
-open import Polynomials.Multi commutativeSemiring _≟C_
+open import Polynomials.CommutativeSemiring.Normal commutativeSemiring _≟C_
   using (Poly; _⊞_; _⊠_; κ; ι)
   renaming (⟦_⟧ to ⟦_⟧ₚ)
 
@@ -41,7 +41,7 @@ norm (x ⊗ y) = norm x ⊠ norm y
 ⟦_⇓⟧ : ∀ {n} → Expr n → Vec Carrier n → Carrier
 ⟦ x ⇓⟧ = ⟦ norm x ⟧ₚ
 
-import Polynomials.Multi.Homomorphism commutativeSemiring _≟C_ as Hom
+import Polynomials.CommutativeSemiring.Homomorphism commutativeSemiring _≟C_ as Hom
 open import Function
 
 correct : ∀ {n} (e : Expr n) ρ → ⟦ e ⇓⟧ ρ ≈ ⟦ e ⟧ ρ

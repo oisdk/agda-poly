@@ -16,7 +16,7 @@ open import Function
 open import Data.Fin as Fin using (Fin)
 
 -- Multivariate polynomials.
-module Polynomials.Multi
+module Polynomials.CommutativeSemiring.Normal
   {a ℓ}
   (commutativeSemiring : CommutativeSemiring a ℓ)
   (_≟C_ : Decidable (CommutativeSemiring._≈_ commutativeSemiring))
