@@ -20,8 +20,6 @@ open CommutativeSemiring commutativeSemiring
 open import Polynomials.Multi commutativeSemiring _≟C_
 open import Data.List as List using ([]; _∷_)
 open import Data.Nat as ℕ using (ℕ; suc; zero)
--- import Data.List.Relation.Equality.DecSetoid as []-≈
--- import Data.List.Relation.Equality.Setoid as []-≈
 open import Data.List.Relation.Pointwise as Pointwise using (Pointwise)
 open import Level using (lift; _⊔_; lower)
 open import Data.Vec as Vec using (Vec; []; _∷_)
