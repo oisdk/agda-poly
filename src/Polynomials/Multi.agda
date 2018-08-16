@@ -128,6 +128,9 @@ mutual
   ⊞-coeffs (x ∷ xs) [] = x ∷ xs
   ⊞-coeffs ((x , p) ∷ xs) ((y , q) ∷ ys) = ⊞-ne (ℕ.compare p q) x xs y ys
 
+  _⊕_ : ∀ {n} → Coeff n → Coeff n → Poly n
+  x ⊕ y = fst~ x ⊞ fst~ y
+
   ⊞-ne : ∀ {p q n}
       → ℕ.Ordering p q
       → (x : Coeff n)
@@ -137,7 +140,7 @@ mutual
       → Coeffs n
   ⊞-ne (ℕ.less    i k) x xs y ys = (x , i) ∷ ⊞-ne-l k xs y ys
   ⊞-ne (ℕ.greater j k) x xs y ys = (y , j) ∷ ⊞-ne-r k x xs ys
-  ⊞-ne (ℕ.equal   i  ) x xs y ys = (fst~ x ⊞ fst~ y , i) ∷↓ (⊞-coeffs xs ys)
+  ⊞-ne (ℕ.equal   i  ) x xs y ys = (x ⊕ y , i) ∷↓ (⊞-coeffs xs ys)
 
   ⊞-ne-l : ∀ {n} → ℕ → Coeffs n → (y : Coeff n) → Coeffs n → Coeffs n
   ⊞-ne-l k [] y ys = (y , k) ∷ ys
